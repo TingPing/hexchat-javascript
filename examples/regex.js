@@ -9,7 +9,7 @@ function chan_cb (params)
 {
 	if (params[1].search(re)) // message
 	{
-		command('say ' + params[0] + ', You should change your password.'); // nick
+		command('say ' + params[0] + get_prefs('completion_suffix') + ' You should change your password.'); // nick
 	}
 }
 
