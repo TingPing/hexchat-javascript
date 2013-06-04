@@ -970,7 +970,6 @@ hjs_delpluginpref (JSContext *context, unsigned argc, jsval *vp)
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "S", &var))
 		return JS_FALSE;
 
-	// it is always stored as a string anyway.
 	ret = hexchat_pluginpref_delete (prefph, JSSTRING_TO_CHAR(var));
 
 	JS_SET_RVAL (context, vp, BOOLEAN_TO_JSVAL(ret));
