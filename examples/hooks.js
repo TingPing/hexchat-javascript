@@ -25,5 +25,11 @@ function timer_cb ()
 	return true; // return true to continue the timer
 }
 
+function unload_cb ()
+{
+	print("No don't kill me!");
+}
+
 hook_command ('test', test_cb, 'there is no help for test =(');
 timer_hook = hook_timer (10000, timer_cb); // 10 sec
+hook_unload (unload_cb);

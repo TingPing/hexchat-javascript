@@ -54,7 +54,7 @@ enum hook_type
 	HOOK_PRINT,
 	HOOK_SERVER,
 	HOOK_TIMER,
-	HOOK_UNHOOK
+	HOOK_UNLOAD
 };
 
 typedef struct
@@ -900,6 +900,24 @@ hjs_hooktimer (JSContext *context, unsigned argc, jsval *vp)
 }
 
 static JSBool
+hjs_hookunload (JSContext *context, unsigned argc, jsval *vp)
+{
+	JSObject* funcobj;
+	JSObject* userdata = NULL;
+	script_hook* hook = new script_hook;
+	js_script* script = hjs_script_find (context);
+
+	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "o/o", &funcobj, &userdata))
+		return JS_FALSE;
+
+	script->add_hook (hook, HOOK_UNLOAD, context, funcobj, userdata, NULL);
+
+	JS_SET_RVAL (context, vp, JSVAL_VOID);
+
+	return JS_TRUE;
+}
+
+static JSBool
 hjs_unhook (JSContext *context, unsigned argc, jsval *vp)
 {
 	long hooknum;
@@ -1067,7 +1085,7 @@ static JSFunctionSpec hexchat_functions[] = {
 	{"hook_server", hjs_hookserver, 4, JSPROP_READONLY|JSPROP_PERMANENT},
 	{"hook_timer", hjs_hooktimer, 3, JSPROP_READONLY|JSPROP_PERMANENT},
 	{"hook_print", hjs_hookprint, 5, JSPROP_READONLY|JSPROP_PERMANENT},
-	//{"hook_unhook", hjs_hookunhook, 3, JSPROP_READONLY|JSPROP_PERMANENT},
+	{"hook_unload", hjs_hookunload, 2, JSPROP_READONLY|JSPROP_PERMANENT},
 	{"unhook", hjs_unhook, 1, JSPROP_READONLY|JSPROP_PERMANENT},
 	{"get_list", hjs_getlist, 1, JSPROP_READONLY|JSPROP_PERMANENT},
 	{"find_context", hjs_findcontext, 2, JSPROP_READONLY|JSPROP_PERMANENT},
@@ -1184,7 +1202,19 @@ js_script::~js_script ()
 {
 	for (script_hook* hook : hooks)
 	{
-		hexchat_unhook (ph, hook->hook);
+		if (hook->type == HOOK_UNLOAD)
+		{
+			JSFunction* fun = JS_ValueToFunction (hook->context, OBJECT_TO_JSVAL(hook->callback));
+			jsval argv[] = { OBJECT_TO_JSVAL(hook->userdata) };
+			jsval rval;
+
+			JS_CallFunction (hook->context, JS_GetGlobalForScopeChain (hook->context), fun, 1, argv, &rval);
+		}
+		else
+		{
+			hexchat_unhook (ph, hook->hook);
+		}
+
 		delete hook;
 	}
 
