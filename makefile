@@ -9,8 +9,8 @@ clean:
 	rm $(OUTFILE)
 
 install:
-	install -m 644 -D $(OUTFILE) "$HOME/.config/hexchat/addons/$OUTFILE"
+	install -m 644 -D $(OUTFILE) $(HOME)/.config/hexchat/addons/$(OUTFILE)
 
 uninstall:
-	rm "$HOME/.config/hexchat/addons/$OUTFILE"
+	rm $(HOME)/.config/hexchat/addons/$(OUTFILE)
 
