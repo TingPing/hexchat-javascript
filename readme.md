@@ -27,7 +27,8 @@ If not on Fedora you can simply install the js-devel package from your distro of
 ###Windows:
 
 
-You must download the [xulrunner-sdk](https://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/10.0.4esr/sdk/xulrunner-10.0.4esr.en-US.win32.sdk.zip)
+Place the dll above in the *addons* folder within your [config dir](http://docs.hexchat.org/en/latest/settings.html#config-files)
+and you must download the [xulrunner-sdk](https://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/10.0.4esr/sdk/xulrunner-10.0.4esr.en-US.win32.sdk.zip)
 and add its *bin* folder to your PATH.
 
 
