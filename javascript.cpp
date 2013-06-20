@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#ifndef WIN32
+#ifndef _WIN32
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 #endif
 
@@ -10,9 +10,15 @@
 #include <fstream>
 #include <list>
 
-#include <dirent.h>
-#include <jsapi.h>
+#ifdef _WIN32
+#include "win32/dirent.h"
+#include "win32/hexchat-plugin.h"
+#else
 #include <hexchat-plugin.h>
+#include <dirent.h>
+#endif
+#include <jsapi.h>
+
 
 #define HJS_VERSION_STR "0.1"
 #define HJS_VERSION_FLOAT 0.1
@@ -21,7 +27,7 @@
 #define DEFINE_GLOBAL_PROP(name, value) JS_DefineProperty (*cx, *globals, name, value, NULL, NULL, \
 														JSPROP_READONLY|JSPROP_PERMANENT)
 
-#ifdef WIN32
+#ifdef _WIN32
 #define DIR_SEP '\\'
 #else
 #define DIR_SEP '/'
@@ -104,9 +110,11 @@ hjs_util_expandfile (string file)
 
 	if (!absolute)
 	{
+#ifndef _WIN32
 		if (file[0] == '~')
 			expanded = string(getenv("HOME")) + DIR_SEP + file.substr(2);
 		else
+#endif
 			expanded = string(hexchat_get_info (ph, "configdir")) + DIR_SEP + "addons" + DIR_SEP + file;
 	}
 

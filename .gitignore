@@ -1,1 +1,6 @@
 javascript.so
+
+# Visual Studio
+win32/[Dd]ebug/
+win32/[Rr]elease/
+win32/*sdf
