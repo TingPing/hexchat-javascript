@@ -172,10 +172,10 @@ hjs_util_datefromtime (JSContext *context, time_t time)
 	jsval args[1];
 
 	if (!JS_EnterLocalRootScope(context))
-        return JSVAL_VOID;
+		return JSVAL_VOID;
 
 	if (!JS_GetClassObject(context, JS_GetGlobalObject(context), JSProto_Date, &date_constructor))
-        return JSVAL_VOID;
+		return JSVAL_VOID;
 
 	if (!JS_GetProperty(context, date_constructor, "prototype", &date_prototype))
 		return JSVAL_VOID;
