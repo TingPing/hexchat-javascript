@@ -1,5 +1,5 @@
-CFLAGS := -O2 -std=c++0x -Wall -fPIC -shared
-CFLAGS += `pkg-config --libs --cflags libjs`
+CFLAGS := -O2 -std=c++0x -Wall -fPIC -shared $(CFLAGS) 
+CFLAGS += `pkg-config --libs --cflags mozjs185`
 OUTFILE := javascript.so
 
 all:
