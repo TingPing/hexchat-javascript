@@ -40,9 +40,9 @@ Done:
 - Interpreter via */js*
 - Runtime per script
 - Full coverage of hexchat api
+- Windows(32bit) and Unix support
 
 Todo:
 
 - Error checking, testing, etc
 - Objectify all the things?
-- Windows project
