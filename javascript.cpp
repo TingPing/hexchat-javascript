@@ -11,11 +11,12 @@
 #include <list>
 
 #ifdef _WIN32
+#include <Shlwapi.h> // For PathIsRelative
 #include "win32/dirent.h"
 #include "win32/hexchat-plugin.h"
 #else
-#include <hexchat-plugin.h>
 #include <dirent.h>
+#include <hexchat-plugin.h>
 #endif
 #include <jsapi.h>
 
@@ -104,9 +105,13 @@ hjs_util_expandfile (string file)
 	string expanded = file;
 	bool absolute = false;
 
-	// FIXME
-	if (file[0] == '/' || file[0] == 'C')
+#ifdef _WIN32
+	if (!PathIsRelative(file.c_str()))
 		absolute = true;
+#else
+	if (file[0] == '/')
+		absolute = true;
+#endif
 
 	if (!absolute)
 	{
