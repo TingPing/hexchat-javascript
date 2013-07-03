@@ -32,14 +32,14 @@ Building
 
 ###Linux:
 
-1. Install the js dev package from your distro of choice.
+1. Install the hexchat and js dev package from your distro of choice.
 2. *make && make install*
 
 ###Windows:
 
 1. Download [xulrunner-sdk](https://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/10.0.4esr/sdk/xulrunner-10.0.4esr.en-US.win32.sdk.zip).
 2. Update path in [hexchat-javascript.props](win32/hexchat-javascript.props).
-3. Open in VS 2012 and build.
+3. Open in [Visual Studio](https://www.microsoft.com/visualstudio/eng/products/visual-studio-express-products) and build.
 
 Features
 --------
