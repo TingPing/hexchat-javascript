@@ -20,16 +20,26 @@ Downloads
 Installation
 ------------
 
-###Linux:
-
-If not on Fedora you can simply install the js dev package from your distro of choice and *make && make install*.
-
 ###Windows:
 
 Place the dll above in the *addons* folder within your [config dir](http://docs.hexchat.org/en/latest/settings.html#config-files)
 and you must download the [xulrunner-sdk](https://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/10.0.4esr/sdk/xulrunner-10.0.4esr.en-US.win32.sdk.zip)
 and add its *bin* folder to your PATH.
 
+
+Building
+--------
+
+###Linux:
+
+1. Install the js dev package from your distro of choice.
+2. *make && make install*
+
+###Windows:
+
+1. Download [xulrunner-sdk](https://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/10.0.4esr/sdk/xulrunner-10.0.4esr.en-US.win32.sdk.zip).
+2. Update path in [hexchat-javascript.props](win32/hexchat-javascript.props).
+3. Open in VS 2012 and build.
 
 Features
 --------
