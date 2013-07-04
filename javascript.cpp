@@ -833,6 +833,8 @@ hjs_hookcmd (JSContext *context, unsigned argc, jsval *vp)
 	JSObject* funcobj;
 	JSObject* userdata = nullptr;
 	jsval ret;
+	char* chelpstr = nullptr;
+	char* ccmdstr;
 	int pri = HEXCHAT_PRI_NORM;
 	hexchat_hook* hexhook;
 	script_hook* hook = new script_hook;
@@ -846,9 +848,15 @@ hjs_hookcmd (JSContext *context, unsigned argc, jsval *vp)
 	if (!JS_ObjectIsFunction (context, funcobj))
 		return JS_FALSE;
 
-	hexhook = hexchat_hook_command (ph, JSSTRING_TO_CHAR(cmdstr), pri, hjs_callback,
-									helpstr ? JSSTRING_TO_CHAR(helpstr) : "", hook);
+	ccmdstr = JSSTRING_TO_CHAR(cmdstr);
+	if (helpstr)
+		chelpstr = JSSTRING_TO_CHAR(helpstr);
 
+	hexhook = hexchat_hook_command (ph, ccmdstr, pri, hjs_callback, helpstr ? chelpstr : "", hook);
+
+	JS_free(context, ccmdstr);
+	if (chelpstr)
+		JS_free(context, chelpstr);
 
 	script->add_hook (hook, HOOK_CMD, context, funcobj, userdata, hexhook);
 
@@ -867,6 +875,7 @@ hjs_hookprint (JSContext *context, unsigned argc, jsval *vp)
 	JSObject* funcobj;
 	JSObject* userdata = nullptr;
 	jsval ret;
+	char* cevent;
 	int pri = HEXCHAT_PRI_NORM;
 	hexchat_hook* hexhook;
 	script_hook* hook = new script_hook;
@@ -879,7 +888,9 @@ hjs_hookprint (JSContext *context, unsigned argc, jsval *vp)
 	if (!JS_ObjectIsFunction (context, funcobj))
 		return JS_FALSE;
 
-	hexhook = hexchat_hook_print (ph, JSSTRING_TO_CHAR(event), pri, hjs_callback, hook);
+	cevent = JSSTRING_TO_CHAR(event);
+	hexhook = hexchat_hook_print (ph, cevent, pri, hjs_callback, hook);
+	JS_free(context, cevent);
 
 	script->add_hook (hook, HOOK_PRINT, context, funcobj, userdata, hexhook);
 
@@ -898,6 +909,7 @@ hjs_hookserver (JSContext *context, unsigned argc, jsval *vp)
 	JSObject* funcobj;
 	JSObject* userdata = nullptr;
 	jsval ret;
+	char* cserverstr;
 	int pri = HEXCHAT_PRI_NORM;
 	hexchat_hook* hexhook;
 	script_hook* hook = new script_hook;
@@ -910,7 +922,9 @@ hjs_hookserver (JSContext *context, unsigned argc, jsval *vp)
 	if (!JS_ObjectIsFunction (context, funcobj))
 		return JS_FALSE;
 
-	hexhook = hexchat_hook_server (ph, JSSTRING_TO_CHAR(serverstr), pri, hjs_callback, hook);
+	cserverstr = JSSTRING_TO_CHAR(serverstr);
+	hexhook = hexchat_hook_server (ph, cserverstr, pri, hjs_callback, hook);
+	JS_free(context, cserverstr);
 
 	script->add_hook (hook, HOOK_SERVER, context, funcobj, userdata, hexhook);
 
