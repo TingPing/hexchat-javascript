@@ -37,10 +37,10 @@
 using namespace std;
 
 static hexchat_plugin *ph;
-static char *name = "javascript";
-static char *version = HJS_VERSION_STR;
-static char *description = "Javascript scripting interface";
-static const char *help = "Usage: JS <command>\n       Use LOAD, UNLOAD, RELOAD or Window > Plugins… to manage scripts.";
+static char* name = "javascript";
+static char* version = HJS_VERSION_STR;
+static char* description = "Javascript scripting interface";
+static const char* help = "Usage: JS <command>\n       Use LOAD, UNLOAD, RELOAD or Window > Plugins… to manage scripts.";
 
 static JSRuntime *interp_rt;
 static JSContext *interp_cx;
@@ -160,7 +160,7 @@ hjs_util_isscript (string file)
 }
 
 static jsval
-hjs_util_buildword (JSContext* context, char *word[])
+hjs_util_buildword (JSContext* context, char* word[])
 {
 	JSObject* wordlist = JS_NewArrayObject (context, 0, nullptr);
 
@@ -340,7 +340,7 @@ hjs_script_autoload ()
 /* hexchat commands */
 
 static int
-hjs_load_cb (char *word[], char *word_eol[], void *userdata)
+hjs_load_cb (char* word[], char* word_eol[], void *userdata)
 {
 	if (hjs_script_load (string(word[2])))
 		return HEXCHAT_EAT_ALL;
@@ -349,7 +349,7 @@ hjs_load_cb (char *word[], char *word_eol[], void *userdata)
 }
 
 static int
-hjs_unload_cb (char *word[], char *word_eol[], void *userdata)
+hjs_unload_cb (char* word[], char* word_eol[], void *userdata)
 {
 	if (hjs_script_unload (string(word[2])))
 		return HEXCHAT_EAT_ALL;
@@ -358,7 +358,7 @@ hjs_unload_cb (char *word[], char *word_eol[], void *userdata)
 }
 
 static int
-hjs_reload_cb (char *word[], char *word_eol[], void *userdata)
+hjs_reload_cb (char* word[], char* word_eol[], void *userdata)
 {
 	if (hjs_script_reload (string(word[2])))
 		return HEXCHAT_EAT_ALL;
@@ -367,11 +367,11 @@ hjs_reload_cb (char *word[], char *word_eol[], void *userdata)
 }
 
 static int
-hjs_cmd_cb (char *word[], char *word_eol[], void *userdata)
+hjs_cmd_cb (char* word[], char* word_eol[], void *userdata)
 {
 	jsval rval = JSVAL_VOID;
 	JSString* str;
-	char *ret;
+	char* ret;
 
 	if (word[2][0] != 0)
 	{
@@ -394,7 +394,7 @@ hjs_cmd_cb (char *word[], char *word_eol[], void *userdata)
 }
 
 static void
-hjs_print_error (JSContext* context, const char *message, JSErrorReport* report)
+hjs_print_error (JSContext* context, const char* message, JSErrorReport* report)
 {
 	js_script* script = hjs_script_find (context);
 	string file = hjs_util_shrinkfile (script->filename);
@@ -412,7 +412,7 @@ hjs_print_error (JSContext* context, const char *message, JSErrorReport* report)
 /* callback functions for hooks */
 
 static int
-hjs_callback (char *word[], char *word_eol[], void *hook) // command
+hjs_callback (char* word[], char* word_eol[], void *hook) // command
 {
 	JSContext* context = ((script_hook*)hook)->context;
 	JSFunction* fun = JS_ValueToFunction (context, OBJECT_TO_JSVAL(((script_hook*)hook)->callback));
@@ -432,7 +432,7 @@ hjs_callback (char *word[], char *word_eol[], void *hook) // command
 }
 
 static int
-hjs_callback (char *word[], void *hook) // server and print
+hjs_callback (char* word[], void *hook) // server and print
 {
 	JSContext* context = ((script_hook*)hook)->context;
 	JSFunction* fun = JS_ValueToFunction (context, OBJECT_TO_JSVAL(((script_hook*)hook)->callback));
@@ -567,8 +567,8 @@ hjs_strip (JSContext *context, unsigned argc, jsval *vp)
 {
 	JSString* str;
 	JSString* ret;
-	char *cstr;
-	char *cret;
+	char* cstr;
+	char* cret;
 	int flags = 3;
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "S/i", &str, &flags))
@@ -598,8 +598,8 @@ hjs_getinfo (JSContext *context, unsigned argc, jsval *vp)
 {
 	JSString* str;
 	JSString* ret;
-	char *cstr;
-	const char *cret;
+	char* cstr;
+	const char* cret;
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "S", &str))
 		return JS_FALSE;
@@ -626,8 +626,8 @@ hjs_getprefs (JSContext *context, unsigned argc, jsval *vp)
 {
 	JSString* str;
 	JSString* ret;
-	char *cstr;
-	const char *cstrret;
+	char* cstr;
+	const char* cstrret;
 	int intret, cret;
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "S", &str))
@@ -665,9 +665,9 @@ hjs_getlist (JSContext *context, unsigned argc, jsval *vp)
 {
 	JSString* list_name;
 	JSObject* js_list;
-	const char *const *fields;
-	const char *field;
-	char *name;
+	const char* const *fields;
+	const char* field;
+	char* name;
 	hexchat_list* list = nullptr;
 	jsval iattr, sattr, tattr;
 
@@ -757,8 +757,8 @@ hjs_findcontext (JSContext *context, unsigned argc, jsval *vp)
 {
 	JSString* network = nullptr;
 	JSString* channel = nullptr;
-	char *cnetwork = nullptr;
-	char *cchannel = nullptr;
+	char* cnetwork = nullptr;
+	char* cchannel = nullptr;
 	jsval ret;
 	hexchat_context* ctx;
 
@@ -1000,8 +1000,8 @@ hjs_setpluginpref (JSContext *context, unsigned argc, jsval *vp)
 	hexchat_plugin* prefph = hjs_script_gethandle (context); // fake handle to save to own conf file
 	JSString* var;
 	JSString* val;
-	char *cvar;
-	char *cval;
+	char* cvar;
+	char* cval;
 	int ret;
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "SS", &var, &val))
@@ -1026,7 +1026,7 @@ hjs_delpluginpref (JSContext *context, unsigned argc, jsval *vp)
 {
 	hexchat_plugin* prefph = hjs_script_gethandle (context);
 	JSString* var;
-	char *cvar;
+	char* cvar;
 	int ret;
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "S", &var))
@@ -1093,7 +1093,7 @@ hjs_getpluginpref (JSContext *context, unsigned argc, jsval *vp)
 	hexchat_plugin* prefph = hjs_script_gethandle (context);
 	JSString* var;
 	JSString* retstr;
-	char *cvar;
+	char* cvar;
 	char cretstr[512];
 	int cret, cretint;
 
@@ -1302,7 +1302,7 @@ js_script::~js_script ()
 extern "C"
 {
 	int
-	hexchat_plugin_init (hexchat_plugin *plugin_handle, char **plugin_name, char **plugin_desc, char **plugin_version, char *arg)
+	hexchat_plugin_init (hexchat_plugin *plugin_handle, char* *plugin_name, char* *plugin_desc, char* *plugin_version, char* arg)
 	{
 		ph = plugin_handle;
 		*plugin_name = name;
