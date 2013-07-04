@@ -39,7 +39,7 @@ Building
 
 1. Download [xulrunner-sdk](https://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/10.0.4esr/sdk/xulrunner-10.0.4esr.en-US.win32.sdk.zip).
 2. Update path in [hexchat-javascript.props](win32/hexchat-javascript.props).
-3. Open in [Visual Studio](https://www.microsoft.com/visualstudio/eng/products/visual-studio-express-products) and build.
+3. Open in [Visual Studio](https://www.microsoft.com/visualstudio/eng/downloads#d-express-windows-desktop) and build.
 
 Features
 --------
