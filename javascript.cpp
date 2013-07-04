@@ -240,7 +240,7 @@ hjs_script_gethandle (JSContext* context)
 }
 
 static string
-hjs_script_getproperty (JSContext* context, string property)
+hjs_script_getproperty (JSContext* context, string property, string fallback)
 {
 	JSObject* globals = JS_GetGlobalForScopeChain (context);
 	JSBool found;
@@ -255,7 +255,7 @@ hjs_script_getproperty (JSContext* context, string property)
 		}
 	}
 
-	return "";
+	return fallback;
 }
 
 static void
@@ -1234,9 +1234,9 @@ js_script::js_script (string file, string src)
 	js_init (&fake_context, &fake_runtime, &fake_globals, true);
 	JS_EvaluateScript (fake_context, fake_globals, src.c_str(), src.length(), file.c_str(), 0, nullptr);
 
-	name = hjs_script_getproperty (fake_context, "SCRIPT_NAME");
-	desc = hjs_script_getproperty (fake_context, "SCRIPT_DESC");
-	version = hjs_script_getproperty (fake_context, "SCRIPT_VER");
+	name = hjs_script_getproperty (fake_context, "SCRIPT_NAME", hjs_util_shrinkfile(file));
+	desc = hjs_script_getproperty (fake_context, "SCRIPT_DESC", file);
+	version = hjs_script_getproperty (fake_context, "SCRIPT_VER", "0");
 	gui = hexchat_plugingui_add (ph, file.c_str(), name.c_str(), desc.c_str(), version.c_str(), nullptr);
 
 	js_deinit (fake_context, fake_runtime);
@@ -1285,13 +1285,6 @@ js_script::~js_script ()
 
 		delete hook;
 	}
-
-	if (!name.empty())
-		JS_free(context, &name);
-	if (!desc.empty())
-		JS_free(context, &desc);
-	if (!version.empty())
-		JS_free(context, &version);
 
 	js_deinit (context, runtime);
 
