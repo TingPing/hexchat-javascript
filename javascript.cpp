@@ -1231,7 +1231,6 @@ js_deinit (JSContext *cx, JSRuntime *rt)
 {
     JS_DestroyContext(cx);
     JS_DestroyRuntime(rt);
-    JS_ShutDown();
 }
 
 js_script::js_script (string file, string src)
@@ -1340,6 +1339,7 @@ extern "C"
 	{
 		js_deinit (interp_cx, interp_rt);
 		hjs_script_cleanup ();
+		JS_ShutDown();
 		hexchat_printf (ph, "%s version %s unloaded.\n", name, version);
 
 		return 1;
