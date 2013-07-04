@@ -255,7 +255,7 @@ hjs_script_getproperty (JSContext* context, string property)
 		}
 	}
 
-	return "Unknown";
+	return "";
 }
 
 static void
@@ -383,6 +383,7 @@ hjs_cmd_cb (char *word[], char *word_eol[], void *userdata)
 				ret = JS_EncodeString (interp_cx, str);
 				// fancy blue message, might be annoying but otherwise confusing
 				hexchat_printf (ph, "\00318JavaScript Output:\017 %s", ret);
+				JS_free(interp_cx, ret);
 			}
 		}
 	}
@@ -475,13 +476,18 @@ hjs_print (JSContext *context, unsigned argc, jsval *vp)
 {
 	JSObject* obj;
 	JSString* str;
+	char* cstr;
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "o", &obj))
 		return JS_FALSE;
 
 	str = JS_ValueToString (context, OBJECT_TO_JSVAL(obj));
 	if (str != nullptr)
-		hexchat_print (ph, JSSTRING_TO_CHAR(str));
+	{
+		cstr = JSSTRING_TO_CHAR(str);
+		hexchat_print (ph, cstr);
+		JS_free(context, cstr);
+	}
 
 	JS_SET_RVAL (context, vp, JSVAL_VOID);
 
@@ -507,6 +513,9 @@ hjs_emitprint (JSContext *context, unsigned argc, jsval *vp)
 	ret = hexchat_emit_print (ph, JSSTRING_TO_CHAR(name),
 							carg[0], carg[1], carg[2], carg[3], carg[4], nullptr);
 
+	for (int i = 0; i < 5; i++)
+		JS_free(context, carg[i]);
+
 	JS_SET_RVAL (context, vp, BOOLEAN_TO_JSVAL(ret));
 
 	return JS_TRUE;
@@ -516,11 +525,14 @@ static JSBool
 hjs_command (JSContext *context, unsigned argc, jsval *vp)
 {
 	JSString* cmd;
+	char* ccmd;
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "S", &cmd))
 		return JS_FALSE;
 
-	hexchat_command (ph, JSSTRING_TO_CHAR(cmd));
+	ccmd = JSSTRING_TO_CHAR(cmd);
+	hexchat_command (ph, ccmd);
+	JS_free(context, ccmd);
 
 	JS_SET_RVAL (context, vp, JSVAL_VOID);
 
@@ -532,12 +544,19 @@ hjs_nickcmp (JSContext *context, unsigned argc, jsval *vp)
 {
 	JSString* nick1;
 	JSString* nick2;
+	char* cnick1;
+	char* cnick2;
 	int ret;
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "SS", &nick1, &nick2))
 		return JS_FALSE;
 
-	ret = hexchat_nickcmp (ph, JSSTRING_TO_CHAR(nick1), JSSTRING_TO_CHAR(nick2));
+	cnick1 = JSSTRING_TO_CHAR(nick1);
+	cnick2 = JSSTRING_TO_CHAR(nick2);
+	ret = hexchat_nickcmp (ph, cnick1, cnick2);
+	JS_free(context, cnick1);
+	JS_free(context, cnick2);
+
 	JS_SET_RVAL (context, vp, INT_TO_JSVAL (ret));
 
 	return JS_TRUE;
@@ -548,13 +567,16 @@ hjs_strip (JSContext *context, unsigned argc, jsval *vp)
 {
 	JSString* str;
 	JSString* ret;
+	char *cstr;
 	char *cret;
 	int flags = 3;
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "S/i", &str, &flags))
 		return JS_FALSE;
 
-	cret = hexchat_strip (ph, JSSTRING_TO_CHAR(str), -1, flags);
+	cstr = JSSTRING_TO_CHAR(str);
+	cret = hexchat_strip (ph, cstr, -1, flags);
+	JS_free(context, cstr);
 
 	if (cret == nullptr)
 	{
@@ -576,12 +598,15 @@ hjs_getinfo (JSContext *context, unsigned argc, jsval *vp)
 {
 	JSString* str;
 	JSString* ret;
+	char *cstr;
 	const char *cret;
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "S", &str))
 		return JS_FALSE;
 
-	cret = hexchat_get_info (ph, JSSTRING_TO_CHAR(str));
+	cstr = JSSTRING_TO_CHAR(str);
+	cret = hexchat_get_info (ph, cstr);
+	JS_free(context, cstr);
 
 	if (cret == nullptr)
 	{
@@ -601,13 +626,16 @@ hjs_getprefs (JSContext *context, unsigned argc, jsval *vp)
 {
 	JSString* str;
 	JSString* ret;
+	char *cstr;
 	const char *cstrret;
 	int intret, cret;
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "S", &str))
 		return JS_FALSE;
 
-	cret = hexchat_get_prefs (ph, JSSTRING_TO_CHAR(str), &cstrret, &intret);
+	cstr = JSSTRING_TO_CHAR(str);
+	cret = hexchat_get_prefs (ph, cstr, &cstrret, &intret);
+	JS_free(context, cstr);
 
 	switch (cret)
 	{
@@ -652,6 +680,7 @@ hjs_getlist (JSContext *context, unsigned argc, jsval *vp)
 	{
 		if (strcmp (fields[i], name) == 0)
 		{
+			JS_free(context, name);
 			name = (char*)fields[i];
 			break;
 		}
@@ -728,14 +757,25 @@ hjs_findcontext (JSContext *context, unsigned argc, jsval *vp)
 {
 	JSString* network = nullptr;
 	JSString* channel = nullptr;
+	char *cnetwork = nullptr;
+	char *cchannel = nullptr;
 	jsval ret;
 	hexchat_context* ctx;
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "/SS", &network, &channel))
 		return JS_FALSE;
 
-	ctx = hexchat_find_context (ph, network ? JSSTRING_TO_CHAR(network) : nullptr ,
-									channel ? JSSTRING_TO_CHAR(channel) : nullptr );
+	if (network)
+		cnetwork = JSSTRING_TO_CHAR(network);
+	if (channel)
+		cchannel = JSSTRING_TO_CHAR(channel);
+
+	ctx = hexchat_find_context (ph, cnetwork, cchannel);
+
+	if (cnetwork)
+		JS_free(context, cnetwork);
+	if (cchannel)
+		JS_free(context, cchannel);
 
 	if (!ctx)
 		JS_SET_RVAL (context, vp, JSVAL_NULL);
@@ -960,13 +1000,21 @@ hjs_setpluginpref (JSContext *context, unsigned argc, jsval *vp)
 	hexchat_plugin* prefph = hjs_script_gethandle (context); // fake handle to save to own conf file
 	JSString* var;
 	JSString* val;
+	char *cvar;
+	char *cval;
 	int ret;
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "SS", &var, &val))
 		return JS_FALSE;
 
+	cvar = JSSTRING_TO_CHAR(var);
+	cval = JSSTRING_TO_CHAR(val);
+
 	// it is always stored as a string anyway.
-	ret = hexchat_pluginpref_set_str (prefph, JSSTRING_TO_CHAR(var), JSSTRING_TO_CHAR(val));
+	ret = hexchat_pluginpref_set_str (prefph, cvar, cval);
+
+	JS_free(context, cvar);
+	JS_free(context, cval);
 
 	JS_SET_RVAL (context, vp, BOOLEAN_TO_JSVAL(ret));
 
@@ -978,12 +1026,15 @@ hjs_delpluginpref (JSContext *context, unsigned argc, jsval *vp)
 {
 	hexchat_plugin* prefph = hjs_script_gethandle (context);
 	JSString* var;
+	char *cvar;
 	int ret;
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "S", &var))
 		return JS_FALSE;
 
-	ret = hexchat_pluginpref_delete (prefph, JSSTRING_TO_CHAR(var));
+	cvar = JSSTRING_TO_CHAR(var);
+	ret = hexchat_pluginpref_delete (prefph, cvar);
+	JS_free(context, cvar);
 
 	JS_SET_RVAL (context, vp, BOOLEAN_TO_JSVAL(ret));
 
@@ -1042,19 +1093,24 @@ hjs_getpluginpref (JSContext *context, unsigned argc, jsval *vp)
 	hexchat_plugin* prefph = hjs_script_gethandle (context);
 	JSString* var;
 	JSString* retstr;
+	char *cvar;
 	char cretstr[512];
 	int cret, cretint;
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "S", &var))
 		return JS_FALSE;
 
+	cvar = JSSTRING_TO_CHAR(var);
 	cret = hexchat_pluginpref_get_str (prefph, JSSTRING_TO_CHAR(var), cretstr);
+	JS_free(context, cvar);
 
 	if (cret)
 	{
 		if (strlen (cretstr) <= 12)
 		{
-			cretint = hexchat_pluginpref_get_int (prefph, JSSTRING_TO_CHAR(var));
+			cvar = JSSTRING_TO_CHAR(var);
+			cretint = hexchat_pluginpref_get_int (prefph, cvar);
+			JS_free(context, cvar);
 
 			if ((cretint == 0) && (strcmp(cretstr, "0") != 0))
 			{
@@ -1229,6 +1285,13 @@ js_script::~js_script ()
 
 		delete hook;
 	}
+
+	if (!name.empty())
+		JS_free(context, &name);
+	if (!desc.empty())
+		JS_free(context, &desc);
+	if (!version.empty())
+		JS_free(context, &version);
 
 	js_deinit (context, runtime);
 
