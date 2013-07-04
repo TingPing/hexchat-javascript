@@ -402,7 +402,7 @@ hjs_print_error (JSContext* context, const char* message, JSErrorReport* report)
 	if (!file.empty())
 	{
 		hexchat_printf (ph, "\00320JavaScript Error in \"%s\":\017 %s", file.c_str(), message);
-		//FIXME hjs_script_unload (file); // It stops executing the script an error, unload it
+		hjs_script_unload (file); // It stops executing the script an error, unload it
 	}
 	else
 		hexchat_printf (ph, "\00320JavaScript Error:\017 %s", message);
