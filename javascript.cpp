@@ -1,4 +1,4 @@
-﻿/* This Source Code Form is subject to the terms of the Mozilla Public
+/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
@@ -25,7 +25,7 @@
 #define HJS_VERSION_FLOAT 0.1
 
 #define JSSTRING_TO_CHAR(jsstr) JS_EncodeString(context, jsstr)
-#define DEFINE_GLOBAL_PROP(name, value) JS_DefineProperty (*cx, *globals, name, value, NULL, NULL, \
+#define DEFINE_GLOBAL_PROP(name, value) JS_DefineProperty (*cx, *globals, name, value, nullptr, nullptr, \
 														JSPROP_READONLY|JSPROP_PERMANENT)
 
 #ifdef _WIN32
@@ -162,12 +162,12 @@ hjs_util_isscript (string file)
 static jsval
 hjs_util_buildword (JSContext* context, char *word[])
 {
-	JSObject* wordlist = JS_NewArrayObject (context, 0, NULL);
+	JSObject* wordlist = JS_NewArrayObject (context, 0, nullptr);
 
 	for (int i = 0; word[i][0]; i++)
 	{
 		JSString* str = JS_NewStringCopyZ (context, word[i]);
-		JS_DefineElement (context, wordlist, i, STRING_TO_JSVAL(str), NULL, NULL,
+		JS_DefineElement (context, wordlist, i, STRING_TO_JSVAL(str), nullptr, nullptr,
 						JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_ENUMERATE);
 	}
 
@@ -198,7 +198,7 @@ hjs_util_datefromtime (JSContext *context, time_t time)
 	if (!JS_NewNumberValue(context, ((double) time) * 1000, &(args[0])))
 		return JSVAL_VOID;
 
-	date = JS_ConstructObjectWithArguments(context, date_class, NULL, NULL, 1, args);
+	date = JS_ConstructObjectWithArguments(context, date_class, nullptr, nullptr, 1, args);
 
 	JS_LeaveLocalRootScope(context);
 	return OBJECT_TO_JSVAL(date);
@@ -215,7 +215,7 @@ hjs_script_find (string name)
 		if (hjs_util_shrinkfile(script->filename) == name || script->name == name)
 			return script;
 
-	return NULL;
+	return nullptr;
 }
 
 static js_script*
@@ -225,7 +225,7 @@ hjs_script_find (JSContext* context)
 		if (script->context == context)
 			return script;
 
-	return NULL;
+	return nullptr;
 }
 
 static hexchat_plugin*
@@ -233,7 +233,7 @@ hjs_script_gethandle (JSContext* context)
 {
 	js_script* script = hjs_script_find (context);
 
-	if (script != NULL && script->gui != NULL)
+	if (script != nullptr && script->gui != nullptr)
 		return (hexchat_plugin*)script->gui;
 	else
 		return ph;
@@ -378,7 +378,7 @@ hjs_cmd_cb (char *word[], char *word_eol[], void *userdata)
 		if (JS_EvaluateScript (interp_cx, interp_globals, word_eol[2], strlen (word_eol[2]), "", 0, &rval))
 		{
 			str = JS_ValueToString (interp_cx, rval);
-			if (!JSVAL_IS_VOID(rval) && str != NULL)
+			if (!JSVAL_IS_VOID(rval) && str != nullptr)
 			{
 				ret = JS_EncodeString (interp_cx, str);
 				// fancy blue message, might be annoying but otherwise confusing
@@ -480,7 +480,7 @@ hjs_print (JSContext *context, unsigned argc, jsval *vp)
 		return JS_FALSE;
 
 	str = JS_ValueToString (context, OBJECT_TO_JSVAL(obj));
-	if (str != NULL)
+	if (str != nullptr)
 		hexchat_print (ph, JSSTRING_TO_CHAR(str));
 
 	JS_SET_RVAL (context, vp, JSVAL_VOID);
@@ -505,7 +505,7 @@ hjs_emitprint (JSContext *context, unsigned argc, jsval *vp)
 		carg[i] = JSSTRING_TO_CHAR(args[i]);
 
 	ret = hexchat_emit_print (ph, JSSTRING_TO_CHAR(name),
-							carg[0], carg[1], carg[2], carg[3], carg[4], NULL);
+							carg[0], carg[1], carg[2], carg[3], carg[4], nullptr);
 
 	JS_SET_RVAL (context, vp, BOOLEAN_TO_JSVAL(ret));
 
@@ -556,7 +556,7 @@ hjs_strip (JSContext *context, unsigned argc, jsval *vp)
 
 	cret = hexchat_strip (ph, JSSTRING_TO_CHAR(str), -1, flags);
 
-	if (cret == NULL)
+	if (cret == nullptr)
 	{
 		JS_SET_RVAL (context, vp, JSVAL_VOID);
 	}
@@ -583,7 +583,7 @@ hjs_getinfo (JSContext *context, unsigned argc, jsval *vp)
 
 	cret = hexchat_get_info (ph, JSSTRING_TO_CHAR(str));
 
-	if (cret == NULL)
+	if (cret == nullptr)
 	{
 		JS_SET_RVAL (context, vp, JSVAL_VOID);
 	}
@@ -640,7 +640,7 @@ hjs_getlist (JSContext *context, unsigned argc, jsval *vp)
 	const char *const *fields;
 	const char *field;
 	char *name;
-	hexchat_list* list = NULL;
+	hexchat_list* list = nullptr;
 	jsval iattr, sattr, tattr;
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "S", &list_name))
@@ -656,22 +656,22 @@ hjs_getlist (JSContext *context, unsigned argc, jsval *vp)
 			break;
 		}
 	}
-	if (name == NULL)
+	if (name == nullptr)
 		goto listerr;
 
-	js_list = JS_NewArrayObject (context, 0, NULL);
-	if (js_list == NULL)
+	js_list = JS_NewArrayObject (context, 0, nullptr);
+	if (js_list == nullptr)
 		goto listerr;
 
 	list = hexchat_list_get (ph, name);
-	if (list == NULL)
+	if (list == nullptr)
 		goto listerr;
 
 	fields = hexchat_list_fields (ph, name);
 	for (int index = 0; hexchat_list_next (ph, list); index++)
 	{
-		JSObject* list_obj = JS_NewObject (context, &list_entry_class, NULL, NULL);
-		if (list_obj == NULL)
+		JSObject* list_obj = JS_NewObject (context, &list_entry_class, nullptr, nullptr);
+		if (list_obj == nullptr)
 			goto listerr;
 
 		for (int i = 0; fields[i]; i++)
@@ -682,21 +682,21 @@ hjs_getlist (JSContext *context, unsigned argc, jsval *vp)
 				case 's': // string
 					sattr = STRING_TO_JSVAL(JS_NewStringCopyZ (context, hexchat_list_str (ph, list, field)));
 					if (!JS_DefineProperty (context, list_obj, field, sattr,
-											NULL, NULL, JSPROP_READONLY|JSPROP_ENUMERATE))
+											nullptr, nullptr, JSPROP_READONLY|JSPROP_ENUMERATE))
 							goto listerr;
 					break;
 
 				case 'i': // int
 					iattr = INT_TO_JSVAL(hexchat_list_int (ph, list, field));
 					if (!JS_DefineProperty (context, list_obj, field, iattr,
-										NULL, NULL, JSPROP_READONLY|JSPROP_ENUMERATE))
+										nullptr, nullptr, JSPROP_READONLY|JSPROP_ENUMERATE))
 							goto listerr;
 					break;
 
 				case 't': // time
 					tattr = hjs_util_datefromtime (context, hexchat_list_time (ph, list, field));
 					if (!JS_DefineProperty (context, list_obj, field, tattr,
-										NULL, NULL, JSPROP_READONLY|JSPROP_ENUMERATE))
+										nullptr, nullptr, JSPROP_READONLY|JSPROP_ENUMERATE))
 							goto listerr;
 					break;
 
@@ -705,7 +705,7 @@ hjs_getlist (JSContext *context, unsigned argc, jsval *vp)
 					break;
 			}
 		}
-		JS_DefineElement (context, js_list, index, OBJECT_TO_JSVAL(list_obj), NULL, NULL,
+		JS_DefineElement (context, js_list, index, OBJECT_TO_JSVAL(list_obj), nullptr, nullptr,
 						JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_ENUMERATE);
 	}
 
@@ -726,16 +726,16 @@ hjs_getlist (JSContext *context, unsigned argc, jsval *vp)
 static JSBool
 hjs_findcontext (JSContext *context, unsigned argc, jsval *vp)
 {
-	JSString* network = NULL;
-	JSString* channel = NULL;
+	JSString* network = nullptr;
+	JSString* channel = nullptr;
 	jsval ret;
 	hexchat_context* ctx;
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "/SS", &network, &channel))
 		return JS_FALSE;
 
-	ctx = hexchat_find_context (ph, network ? JSSTRING_TO_CHAR(network) : NULL ,
-									channel ? JSSTRING_TO_CHAR(channel) : NULL );
+	ctx = hexchat_find_context (ph, network ? JSSTRING_TO_CHAR(network) : nullptr ,
+									channel ? JSSTRING_TO_CHAR(channel) : nullptr );
 
 	if (!ctx)
 		JS_SET_RVAL (context, vp, JSVAL_NULL);
@@ -789,9 +789,9 @@ static JSBool
 hjs_hookcmd (JSContext *context, unsigned argc, jsval *vp)
 {
 	JSString* cmdstr;
-	JSString* helpstr = NULL;
+	JSString* helpstr = nullptr;
 	JSObject* funcobj;
-	JSObject* userdata = NULL;
+	JSObject* userdata = nullptr;
 	jsval ret;
 	int pri = HEXCHAT_PRI_NORM;
 	hexchat_hook* hexhook;
@@ -825,7 +825,7 @@ hjs_hookprint (JSContext *context, unsigned argc, jsval *vp)
 {
 	JSString* event;
 	JSObject* funcobj;
-	JSObject* userdata = NULL;
+	JSObject* userdata = nullptr;
 	jsval ret;
 	int pri = HEXCHAT_PRI_NORM;
 	hexchat_hook* hexhook;
@@ -856,7 +856,7 @@ hjs_hookserver (JSContext *context, unsigned argc, jsval *vp)
 {
 	JSString* serverstr;
 	JSObject* funcobj;
-	JSObject* userdata = NULL;
+	JSObject* userdata = nullptr;
 	jsval ret;
 	int pri = HEXCHAT_PRI_NORM;
 	hexchat_hook* hexhook;
@@ -886,7 +886,7 @@ static JSBool
 hjs_hooktimer (JSContext *context, unsigned argc, jsval *vp)
 {
 	JSObject* funcobj;
-	JSObject* userdata = NULL;
+	JSObject* userdata = nullptr;
 	jsval ret;
 	int timeout;
 	hexchat_hook* hexhook;
@@ -916,14 +916,14 @@ static JSBool
 hjs_hookunload (JSContext *context, unsigned argc, jsval *vp)
 {
 	JSObject* funcobj;
-	JSObject* userdata = NULL;
+	JSObject* userdata = nullptr;
 	script_hook* hook = new script_hook;
 	js_script* script = hjs_script_find (context);
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "o/o", &funcobj, &userdata))
 		return JS_FALSE;
 
-	script->add_hook (hook, HOOK_UNLOAD, context, funcobj, userdata, NULL);
+	script->add_hook (hook, HOOK_UNLOAD, context, funcobj, userdata, nullptr);
 
 	JS_SET_RVAL (context, vp, JSVAL_VOID);
 
@@ -1005,8 +1005,8 @@ hjs_listpluginpref (JSContext *context, unsigned argc, jsval *vp)
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), ""))
 		return JS_FALSE;
 
-	js_list = JS_NewArrayObject (context, 0, NULL);
-	if (js_list == NULL)
+	js_list = JS_NewArrayObject (context, 0, nullptr);
+	if (js_list == nullptr)
 	{
 		JS_SET_RVAL (context, vp, JSVAL_VOID);
 		return JS_FALSE;
@@ -1016,13 +1016,13 @@ hjs_listpluginpref (JSContext *context, unsigned argc, jsval *vp)
 	if (result)
 	{
 		token = strtok (list, ",");
-		while (token != NULL)
+		while (token != nullptr)
 		{
 			list_item = JS_NewStringCopyZ (context, token);
-			JS_DefineElement (context, js_list, index, STRING_TO_JSVAL(list_item), NULL, NULL,
+			JS_DefineElement (context, js_list, index, STRING_TO_JSVAL(list_item), nullptr, nullptr,
 							JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_ENUMERATE);
 
-			token = strtok (NULL, ",");
+			token = strtok (nullptr, ",");
 			index++;
 		}
 	}
@@ -1118,17 +1118,17 @@ js_init (JSContext **cx, JSRuntime **rt, JSObject **globals, bool fake)
 {
 	// 1MB per runtime, unsure how much is actually needed for such basic scripts
 	*rt = JS_NewRuntime (1024 * 1024);
-	if (*rt == NULL)
+	if (*rt == nullptr)
 		return 0;
 
 	*cx = JS_NewContext (*rt, 8192);
-	if (*cx == NULL)
+	if (*cx == nullptr)
 		return 0;
 	JS_SetOptions (*cx, JSOPTION_VAROBJFIX);
 	JS_SetVersion (*cx, JSVERSION_LATEST);
 
-	*globals = JS_NewCompartmentAndGlobalObject (*cx, &global_class, NULL);
-	if (*globals == NULL)
+	*globals = JS_NewCompartmentAndGlobalObject (*cx, &global_class, nullptr);
+	if (*globals == nullptr)
 		return 0;
 
 	if (!JS_InitStandardClasses (*cx, *globals))
@@ -1176,18 +1176,18 @@ js_script::js_script (string file, string src)
 
 	// create a fake runtime to get the scripts name without actually running it, is there an easier way?
 	js_init (&fake_context, &fake_runtime, &fake_globals, true);
-	JS_EvaluateScript (fake_context, fake_globals, src.c_str(), src.length(), file.c_str(), 0, NULL);
+	JS_EvaluateScript (fake_context, fake_globals, src.c_str(), src.length(), file.c_str(), 0, nullptr);
 
 	name = hjs_script_getproperty (fake_context, "SCRIPT_NAME");
 	desc = hjs_script_getproperty (fake_context, "SCRIPT_DESC");
 	version = hjs_script_getproperty (fake_context, "SCRIPT_VER");
-	gui = hexchat_plugingui_add (ph, file.c_str(), name.c_str(), desc.c_str(), version.c_str(), NULL);
+	gui = hexchat_plugingui_add (ph, file.c_str(), name.c_str(), desc.c_str(), version.c_str(), nullptr);
 
 	js_deinit (fake_context, fake_runtime);
 
 	// now the real thing..
 	js_init (&context, &runtime, &globals, false);
-	JS_EvaluateScript (context, globals, src.c_str(), src.length(), file.c_str(), 0, NULL);
+	JS_EvaluateScript (context, globals, src.c_str(), src.length(), file.c_str(), 0, nullptr);
 }
 
 void
@@ -1232,7 +1232,7 @@ js_script::~js_script ()
 
 	js_deinit (context, runtime);
 
-	if (gui != NULL)
+	if (gui != nullptr)
 		hexchat_plugingui_remove(ph, gui);
 }
 
@@ -1249,14 +1249,14 @@ extern "C"
 		if (!js_init (&interp_cx, &interp_rt, &interp_globals, false))
 			return 0;
 
-		hexchat_hook_command (ph, "LOAD", HEXCHAT_PRI_NORM, hjs_load_cb, NULL, NULL);
-		hexchat_hook_command (ph, "UNLOAD", HEXCHAT_PRI_NORM, hjs_unload_cb, NULL, NULL);
-		hexchat_hook_command (ph, "RELOAD", HEXCHAT_PRI_NORM, hjs_reload_cb, NULL, NULL);
-		hexchat_hook_command (ph, "JS", HEXCHAT_PRI_NORM, hjs_cmd_cb, help, NULL);
+		hexchat_hook_command (ph, "LOAD", HEXCHAT_PRI_NORM, hjs_load_cb, nullptr, nullptr);
+		hexchat_hook_command (ph, "UNLOAD", HEXCHAT_PRI_NORM, hjs_unload_cb, nullptr, nullptr);
+		hexchat_hook_command (ph, "RELOAD", HEXCHAT_PRI_NORM, hjs_reload_cb, nullptr, nullptr);
+		hexchat_hook_command (ph, "JS", HEXCHAT_PRI_NORM, hjs_cmd_cb, help, nullptr);
 		hexchat_printf (ph, "%s version %s loaded.\n", name, version);
 
 		// allow avoiding autoload by passing anything
-		if (arg == NULL)
+		if (arg == nullptr)
 			hjs_script_autoload ();
 
 		return 1;
