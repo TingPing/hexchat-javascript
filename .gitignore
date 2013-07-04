@@ -1,4 +1,5 @@
 javascript.so
+*.patch
 
 # Visual Studio
 win32/[Dd]ebug/
