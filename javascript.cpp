@@ -397,7 +397,9 @@ static void
 hjs_print_error (JSContext* context, const char* message, JSErrorReport* report)
 {
 	js_script* script = hjs_script_find (context);
-	string file = hjs_util_shrinkfile (script->filename);
+	string file;
+	if (script)
+		file = hjs_util_shrinkfile (script->filename);
 
 	if (!file.empty())
 	{
