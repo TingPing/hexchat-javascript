@@ -212,7 +212,9 @@ hjs_script_find (string name)
 {
 	// searches by filename OR scriptname
 	for (js_script* script : js_script_list)
-		if (hjs_util_shrinkfile(script->filename) == name || script->name == name)
+		if (script->filename == name
+			|| hjs_util_shrinkfile(script->filename) == name
+			|| script->name == name)
 			return script;
 
 	return nullptr;
