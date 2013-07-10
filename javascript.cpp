@@ -247,13 +247,18 @@ hjs_script_getproperty (JSContext* context, string property, string fallback)
 	JSObject* globals = JS_GetGlobalForScopeChain (context);
 	JSBool found;
 	jsval retval;
+	char* cstr;
+	string str;
 
 	if (JS_HasProperty (context, globals, property.c_str(), &found))
 	{
 		if (found)
 		{
 			JS_GetProperty (context, globals, property.c_str(), &retval);
-			return string(JSSTRING_TO_CHAR(JSVAL_TO_STRING(retval)));
+			cstr = JSSTRING_TO_CHAR(JSVAL_TO_STRING(retval));
+			str = string(cstr);
+			JS_free(context, cstr);
+			return str;
 		}
 	}
 
