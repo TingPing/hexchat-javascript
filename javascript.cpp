@@ -507,8 +507,8 @@ static JSBool
 hjs_emitprint (JSContext *context, unsigned argc, jsval *vp)
 {
 	JSString* name;
-	JSString* args[5];
-	char* carg[5];
+	JSString* args[5] = { nullptr };
+	char* carg[5] = { nullptr };
 	int ret;
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "S/SSSSS",
@@ -517,13 +517,19 @@ hjs_emitprint (JSContext *context, unsigned argc, jsval *vp)
 
 	// convert all jsstrings
 	for (int i = 0; i < 5; i++)
-		carg[i] = JSSTRING_TO_CHAR(args[i]);
+	{
+		if (args[i])
+			carg[i] = JSSTRING_TO_CHAR(args[i]);
+	}
 
 	ret = hexchat_emit_print (ph, JSSTRING_TO_CHAR(name),
 							carg[0], carg[1], carg[2], carg[3], carg[4], nullptr);
 
 	for (int i = 0; i < 5; i++)
-		JS_free(context, carg[i]);
+	{
+		if (carg[i])
+			JS_free(context, carg[i]);
+	}
 
 	JS_SET_RVAL (context, vp, BOOLEAN_TO_JSVAL(ret));
 
