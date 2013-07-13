@@ -12,7 +12,7 @@
 
 #ifdef _WIN32
 #include <Shlwapi.h> // For PathIsRelative
-#include "win32/dirent.h"
+#include "win32/dirent-win32.h"
 #include "win32/hexchat-plugin.h"
 #else
 #include <dirent.h>
