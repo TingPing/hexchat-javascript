@@ -1,6 +1,8 @@
 HexChat Javascript
 ==================
 
+[![Build Status](https://travis-ci.org/TingPing/hexchat-javascript.png?branch=master)](https://travis-ci.org/TingPing/hexchat-javascript)
+
 Javascript interface using Spidermonkey.
 
 It's my first time using javascript and c++ so forgive my mistakes ;)
