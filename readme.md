@@ -11,6 +11,16 @@ Consider this an alpha, everything works well enough to do useful things with it
 but the api is very likely to change and some bugs still exist.
 
 
+Features
+--------
+
+- Load/unload/reload/autoloading scripts
+- Interpreter via */js*
+- Runtime per script
+- Full coverage of hexchat api
+- Windows(32bit) and Unix support
+
+
 Downloads
 ---------
 
@@ -42,19 +52,3 @@ Building
 1. Download [xulrunner-sdk](https://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/10.0.4esr/sdk/xulrunner-10.0.4esr.en-US.win32.sdk.zip).
 2. Update path in [hexchat-javascript.props](win32/hexchat-javascript.props).
 3. Open in [Visual Studio](https://www.microsoft.com/visualstudio/eng/downloads#d-express-windows-desktop) and build.
-
-Features
---------
-
-Done:
-
-- Load/unload/reload/autoloading scripts
-- Interpreter via */js*
-- Runtime per script
-- Full coverage of hexchat api
-- Windows(32bit) and Unix support
-
-Todo:
-
-- Error checking, testing, etc
-- Objectify all the things?
