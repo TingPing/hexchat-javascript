@@ -184,6 +184,9 @@ hjs_util_datefromtime (JSContext *context, time_t time)
 	jsval date_prototype;
 	jsval args[1];
 
+	if (time == 0)
+		return JSVAL_VOID;
+
 	if (!JS_EnterLocalRootScope(context))
 		return JSVAL_VOID;
 
@@ -202,6 +205,20 @@ hjs_util_datefromtime (JSContext *context, time_t time)
 
 	JS_LeaveLocalRootScope(context);
 	return OBJECT_TO_JSVAL(date);
+}
+
+static time_t
+hjs_util_timefromdate (JSContext *context, JSObject *date)
+{
+	jsval retval;
+
+	if (!JS_CallFunctionName(context, date, "getTime", 0, nullptr, &retval))
+		return (time_t)(-1);
+
+	if (JSVAL_IS_INT(retval))
+		return (time_t)(JSVAL_TO_INT(retval));
+
+	return (time_t)(-1);
 }
 
 
@@ -421,6 +438,27 @@ hjs_print_error (JSContext* context, const char* message, JSErrorReport* report)
 /* callback functions for hooks */
 
 static int
+hjs_callback (char* word[], char* word_eol[], hexchat_event_attrs *attrs, void *hook) // server
+{
+	JSContext* context = ((script_hook*)hook)->context;
+	JSFunction* fun = JS_ValueToFunction (context, OBJECT_TO_JSVAL(((script_hook*)hook)->callback));
+	jsval argv[4];
+	jsval rval = JSVAL_VOID;
+
+	argv[0] = hjs_util_buildword (context, word+1);
+	argv[1] = hjs_util_buildword (context, word_eol+1);
+	argv[2] = hjs_util_datefromtime (context, attrs->server_time_utc);
+	argv[3] = OBJECT_TO_JSVAL(((script_hook*)hook)->userdata);
+
+	JS_CallFunction (context, JS_GetGlobalForScopeChain (context), fun, 4, argv, &rval);
+
+	if (JSVAL_IS_VOID(rval))
+		return HEXCHAT_EAT_NONE;
+	else
+		return JSVAL_TO_INT(rval);
+}
+
+static int
 hjs_callback (char* word[], char* word_eol[], void *hook) // command
 {
 	JSContext* context = ((script_hook*)hook)->context;
@@ -441,17 +479,18 @@ hjs_callback (char* word[], char* word_eol[], void *hook) // command
 }
 
 static int
-hjs_callback (char* word[], void *hook) // server and print
+hjs_callback (char* word[], hexchat_event_attrs *attrs, void *hook) // server and print
 {
 	JSContext* context = ((script_hook*)hook)->context;
 	JSFunction* fun = JS_ValueToFunction (context, OBJECT_TO_JSVAL(((script_hook*)hook)->callback));
-	jsval argv[2];
+	jsval argv[3];
 	jsval rval = JSVAL_VOID;
 
 	argv[0] = hjs_util_buildword (context, word+1);
-	argv[1] = OBJECT_TO_JSVAL(((script_hook*)hook)->userdata);
+	argv[1] = hjs_util_datefromtime (context, attrs->server_time_utc);
+	argv[2] = OBJECT_TO_JSVAL(((script_hook*)hook)->userdata);
 
-	JS_CallFunction (context, JS_GetGlobalForScopeChain (context), fun, 2, argv, &rval);
+	JS_CallFunction (context, JS_GetGlobalForScopeChain (context), fun, 3, argv, &rval);
 
 	if (JSVAL_IS_VOID(rval))
 		return HEXCHAT_EAT_NONE;
@@ -509,6 +548,7 @@ hjs_emitprint (JSContext *context, unsigned argc, jsval *vp)
 	JSString* name;
 	JSString* args[5] = { nullptr };
 	char* carg[5] = { nullptr };
+	char* cname;
 	int ret;
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "S/SSSSS",
@@ -516,20 +556,56 @@ hjs_emitprint (JSContext *context, unsigned argc, jsval *vp)
 		return JS_FALSE;
 
 	// convert all jsstrings
-	for (int i = 0; i < 5; i++)
-	{
-		if (args[i])
-			carg[i] = JSSTRING_TO_CHAR(args[i]);
-	}
+	for (int i = 0; args[i]; i++)
+		carg[i] = JSSTRING_TO_CHAR(args[i]);
 
-	ret = hexchat_emit_print (ph, JSSTRING_TO_CHAR(name),
-							carg[0], carg[1], carg[2], carg[3], carg[4], nullptr);
+	cname = JSSTRING_TO_CHAR(name);
 
-	for (int i = 0; i < 5; i++)
-	{
-		if (carg[i])
-			JS_free(context, carg[i]);
-	}
+	ret = hexchat_emit_print (ph, cname, carg[0], carg[1],
+								carg[2], carg[3], carg[4], nullptr);
+
+	JS_free(context, cname);
+
+	for (int i = 0; carg[i]; i++)
+		JS_free(context, carg[i]);
+
+	JS_SET_RVAL (context, vp, BOOLEAN_TO_JSVAL(ret));
+
+	return JS_TRUE;
+}
+
+static JSBool
+hjs_emitprintat (JSContext *context, unsigned argc, jsval *vp)
+{
+	JSObject* date;
+	JSString* name;
+	JSString* args[5] = { nullptr };
+	char* carg[5] = { nullptr };
+	char* cname;
+	hexchat_event_attrs* attrs;
+	int ret;
+
+	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "oS/SSSSS",
+							&date, &name, &args[0], &args[1], &args[2], &args[3], &args[4]))
+		return JS_FALSE;
+
+	// convert all jsstrings
+	for (int i = 0; args[i]; i++)
+		carg[i] = JSSTRING_TO_CHAR(args[i]);
+
+	cname = JSSTRING_TO_CHAR(name);
+
+	attrs = hexchat_event_attrs_create(ph);
+	attrs->server_time_utc = hjs_util_timefromdate(context, date);
+
+	ret = hexchat_emit_print_attrs (ph, attrs, cname, carg[0], carg[1],
+								carg[2], carg[3], carg[4], nullptr);
+
+	hexchat_event_attrs_free(ph, attrs);
+	JS_free(context, cname);
+
+	for (int i = 0; carg[i]; i++)
+		JS_free(context, carg[i]);
 
 	JS_SET_RVAL (context, vp, BOOLEAN_TO_JSVAL(ret));
 
@@ -904,7 +980,7 @@ hjs_hookprint (JSContext *context, unsigned argc, jsval *vp)
 		return JS_FALSE;
 
 	cevent = JSSTRING_TO_CHAR(event);
-	hexhook = hexchat_hook_print (ph, cevent, pri, hjs_callback, hook);
+	hexhook = hexchat_hook_print_attrs (ph, cevent, pri, hjs_callback, hook);
 	JS_free(context, cevent);
 
 	script->add_hook (hook, HOOK_PRINT, context, funcobj, userdata, hexhook);
@@ -938,7 +1014,7 @@ hjs_hookserver (JSContext *context, unsigned argc, jsval *vp)
 		return JS_FALSE;
 
 	cserverstr = JSSTRING_TO_CHAR(serverstr);
-	hexhook = hexchat_hook_server (ph, cserverstr, pri, hjs_callback, hook);
+	hexhook = hexchat_hook_server_attrs (ph, cserverstr, pri, hjs_callback, hook);
 	JS_free(context, cserverstr);
 
 	script->add_hook (hook, HOOK_SERVER, context, funcobj, userdata, hexhook);
@@ -1173,6 +1249,7 @@ hjs_getpluginpref (JSContext *context, unsigned argc, jsval *vp)
 static JSFunctionSpec hexchat_functions[] = {
 	{"print", hjs_print, 1, JSPROP_READONLY|JSPROP_PERMANENT},
 	{"emit_print", hjs_emitprint, 6, JSPROP_READONLY|JSPROP_PERMANENT},
+	{"emit_print_at", hjs_emitprintat, 7, JSPROP_READONLY|JSPROP_PERMANENT},
 	{"command", hjs_command, 1, JSPROP_READONLY|JSPROP_PERMANENT},
 	{"nickcmp", hjs_nickcmp, 2, JSPROP_READONLY|JSPROP_PERMANENT},
 	{"strip", hjs_strip, 2, JSPROP_READONLY|JSPROP_PERMANENT},
