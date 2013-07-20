@@ -24,10 +24,16 @@ Features
 Downloads
 ---------
 
-- [Fedora x64](http://dl.tingping.se/fedora/x86_64/hexchat-javascript-0.1-1.fc19.x86_64.rpm)
+- [Fedora x64](http://dl.tingping.se/fedora/x86_64/)
 - [Arch](https://aur.archlinux.org/packages/hexchat-javascript-git/)
-- [Windows x86](http://dl.tingping.se/hexchat-javascript/win32/hexchat-javascript.dll)
+- [Windows x86](http://dl.tingping.se/hexchat-javascript/win32/)
 
+
+Requirements
+------------
+
+- HexChat 2.9.6+
+- JS 1.8.5
 
 Installation
 ------------
