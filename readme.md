@@ -26,7 +26,7 @@ Downloads
 
 - [Fedora x64](http://dl.tingping.se/fedora/x86_64/)
 - [Arch](https://aur.archlinux.org/packages/hexchat-javascript-git/)
-- [Windows x86](http://dl.tingping.se/hexchat-javascript/win32/)
+- [Windows x86](http://dl.tingping.se/win32/hexchat-javascript/)
 
 
 Requirements
