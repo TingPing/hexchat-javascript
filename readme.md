@@ -5,10 +5,10 @@ HexChat Javascript
 
 Javascript interface using Spidermonkey.
 
-It's my first time using javascript and c++ so forgive my mistakes ;)
-
-Consider this an alpha, everything works well enough to do useful things with it
+Consider this an beta, everything works well enough to do useful things with it
 but the api is very likely to change and some bugs still exist.
+
+For more information check out the [wiki](https://github.com/TingPing/hexchat-javascript/wiki).
 
 
 Features
