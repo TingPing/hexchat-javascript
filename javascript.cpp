@@ -21,8 +21,8 @@
 #include <jsapi.h>
 
 
-#define HJS_VERSION_STR "0.1"
-#define HJS_VERSION_FLOAT 0.1
+#define HJS_VERSION_STR "0.3"
+#define HJS_VERSION_FLOAT 0.3
 
 #define JSSTRING_TO_CHAR(jsstr) JS_EncodeString(context, jsstr)
 #define DEFINE_GLOBAL_PROP(name, value) JS_DefineProperty (*cx, *globals, name, value, nullptr, nullptr, \
