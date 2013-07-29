@@ -499,6 +499,25 @@ hjs_callback (char* word[], hexchat_event_attrs *attrs, void *hook) // server an
 }
 
 static int
+hjs_callback (char* word[], void *hook) // special
+{
+	JSContext* context = ((script_hook*)hook)->context;
+	JSFunction* fun = JS_ValueToFunction (context, OBJECT_TO_JSVAL(((script_hook*)hook)->callback));
+	jsval argv[2];
+	jsval rval = JSVAL_VOID;
+
+	argv[0] = hjs_util_buildword (context, word+1);
+	argv[1] = OBJECT_TO_JSVAL(((script_hook*)hook)->userdata);
+
+	JS_CallFunction (context, JS_GetGlobalForScopeChain (context), fun, 2, argv, &rval);
+
+	if (JSVAL_IS_VOID(rval))
+		return HEXCHAT_EAT_NONE;
+	else
+		return JSVAL_TO_INT(rval);
+}
+
+static int
 hjs_callback (void *hook) // timer
 {
 	JSContext* context = ((script_hook*)hook)->context;
@@ -994,6 +1013,43 @@ hjs_hookprint (JSContext *context, unsigned argc, jsval *vp)
 }
 
 static JSBool
+hjs_hookspecial (JSContext *context, unsigned argc, jsval *vp)
+{
+	JSString* event;
+	JSObject* funcobj;
+	JSObject* userdata = nullptr;
+	jsval ret;
+	char* cevent;
+	int pri = HEXCHAT_PRI_NORM;
+	hexchat_hook* hexhook;
+	script_hook* hook = new script_hook;
+	js_script* script = hjs_script_find (context);
+
+	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "So/oi",
+							&event, &funcobj, &userdata, &pri))
+		return JS_FALSE;
+
+	if (!JS_ObjectIsFunction (context, funcobj))
+		return JS_FALSE;
+
+	/* This is technically the same as hook_print except that hook_print_attrs won't work with
+	 * the "special" hooks, so to avoid confusion or adding another hook_print for attrs
+	 * just create a new function hook_special */
+	cevent = JSSTRING_TO_CHAR(event);
+	hexhook = hexchat_hook_print (ph, cevent, pri, hjs_callback, hook);
+	JS_free(context, cevent);
+
+	script->add_hook (hook, HOOK_PRINT, context, funcobj, userdata, hexhook);
+
+	if (!JS_NewNumberValue(context, (long)hexhook, &ret))
+		JS_SET_RVAL (context, vp, JSVAL_VOID);
+	else
+		JS_SET_RVAL (context, vp, ret);
+
+	return JS_TRUE;
+}
+
+static JSBool
 hjs_hookserver (JSContext *context, unsigned argc, jsval *vp)
 {
 	JSString* serverstr;
@@ -1259,6 +1315,7 @@ static JSFunctionSpec hexchat_functions[] = {
 	{"hook_server", hjs_hookserver, 4, JSPROP_READONLY|JSPROP_PERMANENT},
 	{"hook_timer", hjs_hooktimer, 3, JSPROP_READONLY|JSPROP_PERMANENT},
 	{"hook_print", hjs_hookprint, 5, JSPROP_READONLY|JSPROP_PERMANENT},
+	{"hook_special", hjs_hookspecial, 5, JSPROP_READONLY|JSPROP_PERMANENT},
 	{"hook_unload", hjs_hookunload, 2, JSPROP_READONLY|JSPROP_PERMANENT},
 	{"unhook", hjs_unhook, 1, JSPROP_READONLY|JSPROP_PERMANENT},
 	{"get_list", hjs_getlist, 1, JSPROP_READONLY|JSPROP_PERMANENT},
