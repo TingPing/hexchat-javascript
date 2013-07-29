@@ -176,16 +176,22 @@ hjs_util_buildword (JSContext* context, char* word[])
 
 // from gjs/jsapi-util.c
 static jsval
-hjs_util_datefromtime (JSContext *context, time_t time)
+hjs_util_datefromtime (JSContext *context, time_t server_time)
 {
 	JSObject *date;
 	JSClass *date_class;
 	JSObject *date_constructor;
 	jsval date_prototype;
 	jsval args[1];
+	struct tm *timeinfo;
 
-	if (time == 0)
-		return JSVAL_VOID;
+	// Use current time if no time is given
+	if (server_time == 0)
+	{
+		server_time = time(0);
+		timeinfo = localtime(&server_time);
+		server_time = mktime(timeinfo);
+	}
 
 	if (!JS_EnterLocalRootScope(context))
 		return JSVAL_VOID;
@@ -198,7 +204,7 @@ hjs_util_datefromtime (JSContext *context, time_t time)
 
 	date_class = JS_GetClass(context, JSVAL_TO_OBJECT (date_prototype));
 
-	if (!JS_NewNumberValue(context, ((double) time) * 1000, &(args[0])))
+	if (!JS_NewNumberValue(context, ((double) server_time) * 1000, &(args[0])))
 		return JSVAL_VOID;
 
 	date = JS_ConstructObjectWithArguments(context, date_class, nullptr, nullptr, 1, args);
@@ -213,12 +219,12 @@ hjs_util_timefromdate (JSContext *context, JSObject *date)
 	jsval retval;
 
 	if (!JS_CallFunctionName(context, date, "getTime", 0, nullptr, &retval))
-		return (time_t)(-1);
+		return (time_t)0;
 
 	if (JSVAL_IS_INT(retval))
 		return (time_t)(JSVAL_TO_INT(retval));
 
-	return (time_t)(-1);
+	return (time_t)0;
 }
 
 
