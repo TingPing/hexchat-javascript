@@ -485,7 +485,7 @@ hjs_callback (char* word[], char* word_eol[], void *hook) // command
 }
 
 static int
-hjs_callback (char* word[], hexchat_event_attrs *attrs, void *hook) // server and print
+hjs_callback (char* word[], hexchat_event_attrs *attrs, void *hook) // print
 {
 	JSContext* context = ((script_hook*)hook)->context;
 	JSFunction* fun = JS_ValueToFunction (context, OBJECT_TO_JSVAL(((script_hook*)hook)->callback));
