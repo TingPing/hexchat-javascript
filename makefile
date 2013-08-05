@@ -3,7 +3,7 @@ CFLAGS += `pkg-config --libs --cflags mozjs185`
 OUTFILE := javascript.so
 
 all:
-	cpp $(CFLAGS) javascript.cpp -o $(OUTFILE)
+	c++ $(CFLAGS) javascript.cpp -o $(OUTFILE)
 
 clean:
 	rm $(OUTFILE)
