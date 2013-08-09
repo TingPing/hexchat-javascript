@@ -16,7 +16,7 @@ clean:
 	rm $(OUTFILE)
 
 install:
-	install -m 755 -D $(OUTFILE) "$(DESTDIR)$(shell $(PKG_CONFIG) --variable=hexchatlibdir hexchat-plugin)/$(OUTFILE)"
+	install -m 644 -D $(OUTFILE) "$(DESTDIR)$(shell $(PKG_CONFIG) --variable=hexchatlibdir hexchat-plugin)/$(OUTFILE)"
 
 uninstall:
 	rm "$(DESTDIR)$(shell $(PKG_CONFIG) --variable=hexchatlibdir hexchat-plugin 2>/dev/null)/$(OUTFILE)"
