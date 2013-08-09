@@ -18,7 +18,7 @@ Features
 - Interpreter via */js*
 - Runtime per script
 - Full coverage of hexchat api
-- Windows(32bit) and Unix support
+- Windows and Unix support
 
 
 Downloads
@@ -26,7 +26,7 @@ Downloads
 
 - [Fedora x64](http://dl.tingping.se/fedora/x86_64/)
 - [Arch](https://aur.archlinux.org/packages/hexchat-javascript-git/)
-- [Windows x86](https://github.com/TingPing/hexchat-javascript/releases)
+- [Windows](https://github.com/TingPing/hexchat-javascript/releases)
 
 
 Requirements
@@ -40,9 +40,8 @@ Installation
 
 ###Windows:
 
-Place the dll above in the *addons* folder within your [config dir](http://docs.hexchat.org/en/latest/settings.html#config-files)
-and you must download the [xulrunner-sdk](https://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/10.0.4esr/sdk/xulrunner-10.0.4esr.en-US.win32.sdk.zip)
-and add its *bin* folder to your PATH.
+1. Place the javascript.dll linked above in the *addons* folder within your [config dir](http://docs.hexchat.org/en/latest/settings.html#config-files).
+2. Install Javascript, instructions are on the [wiki](https://github.com/TingPing/hexchat-javascript/wiki/Javascript-on-Windows).
 
 
 Building
