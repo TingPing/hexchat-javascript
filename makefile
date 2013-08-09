@@ -1,16 +1,23 @@
-CFLAGS := -O2 -std=c++0x -Wall -fPIC -shared $(CFLAGS) 
-CFLAGS += `pkg-config --libs --cflags mozjs185`
+CXX ?= g++
+PKG_CONFIG ?= pkg-config
+
+CXXFLAGS ?= -O2
+CXXFLAGS += -std=c++0x -Wall -fPIC
+CXXFLAGS += $(shell $(PKG_CONFIG) --cflags mozjs185) \
+			$(shell $(PKG_CONFIG) --cflags hexchat-plugin)
+LDFLAGS += -shared
+LIBS += $(shell $(PKG_CONFIG) --libs mozjs185)
 OUTFILE := javascript.so
 
 all:
-	c++ $(CFLAGS) javascript.cpp -o $(OUTFILE)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) javascript.cpp -o $(OUTFILE) $(LIBS)
 
 clean:
 	rm $(OUTFILE)
 
 install:
-	install -m 644 -D $(OUTFILE) $(HOME)/.config/hexchat/addons/$(OUTFILE)
+	install -m 755 -D $(OUTFILE) "$(DESTDIR)$(shell $(PKG_CONFIG) --variable=hexchatlibdir hexchat-plugin)/$(OUTFILE)"
 
 uninstall:
-	rm $(HOME)/.config/hexchat/addons/$(OUTFILE)
+	rm "$(DESTDIR)$(shell $(PKG_CONFIG) --variable=hexchatlibdir hexchat-plugin 2>/dev/null)/$(OUTFILE)"
 
