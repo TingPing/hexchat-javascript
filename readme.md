@@ -24,7 +24,7 @@ Features
 Downloads
 ---------
 
-- [Fedora x64](http://dl.tingping.se/fedora/x86_64/)
+- [Fedora](http://dl.tingping.se/fedora/x86_64/)
 - [Arch](https://aur.archlinux.org/packages/hexchat-javascript-git/)
 - [Windows](https://github.com/TingPing/hexchat-javascript/releases)
 
