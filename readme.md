@@ -54,5 +54,5 @@ Building
 
 ###Windows:
 
-1. Download [xulrunner-sdk](https://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/10.0.4esr/sdk/xulrunner-10.0.4esr.en-US.win32.sdk.zip) and update its path in [hexchat-javascript.props](win32/hexchat-javascript.props).
+1. Install my build of Javascript as mentioned on the [wiki](https://github.com/TingPing/hexchat-javascript/wiki/Javascript-on-Windows) and update its path in [hexchat-javascript.props](win32/hexchat-javascript.props).
 2. Open in [Visual Studio](https://www.microsoft.com/visualstudio/eng/downloads#d-express-windows-desktop) and build.
