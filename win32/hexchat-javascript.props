@@ -2,6 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<ImportGroup Label="PropertySheets" />
 	<PropertyGroup Label="UserMacros">
-		<YourSDKPath>..\..\xulrunner-sdk</YourSDKPath>
+		<YourSDKPath>C:\mozilla-build\js-1.8.5\</YourSDKPath>
 	</PropertyGroup>
 </Project>
