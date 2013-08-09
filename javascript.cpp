@@ -202,7 +202,7 @@ hjs_util_datefromtime (JSContext *context, time_t server_time)
 	if (!JS_GetProperty(context, date_constructor, "prototype", &date_prototype))
 		return JSVAL_VOID;
 
-	date_class = JS_GetClass(context, JSVAL_TO_OBJECT (date_prototype));
+	date_class = JS_GET_CLASS(context, JSVAL_TO_OBJECT (date_prototype));
 
 	if (!JS_NewNumberValue(context, ((double) server_time) * 1000, &(args[0])))
 		return JSVAL_VOID;
