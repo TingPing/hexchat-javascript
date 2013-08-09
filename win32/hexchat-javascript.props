@@ -2,6 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<ImportGroup Label="PropertySheets" />
 	<PropertyGroup Label="UserMacros">
+		<!-- Within this folder should be win32 and x64 -->
 		<YourSDKPath>C:\mozilla-build\js-1.8.5\</YourSDKPath>
 	</PropertyGroup>
 </Project>
