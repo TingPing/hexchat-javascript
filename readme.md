@@ -50,7 +50,7 @@ Building
 ###Linux:
 
 1. Install the hexchat and js dev package from your distro of choice.
-2. *make && make install*
+2. *make && sudo make install*
 
 ###Windows:
 
