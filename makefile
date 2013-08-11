@@ -8,6 +8,7 @@ CXXFLAGS += $(shell $(PKG_CONFIG) --cflags mozjs185) \
 LDFLAGS += -shared
 LIBS += $(shell $(PKG_CONFIG) --libs mozjs185)
 OUTFILE := javascript.so
+INSTALLDIR := $(DESTDIR)$(shell $(PKG_CONFIG) --variable=hexchatlibdir hexchat-plugin)
 
 all:
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) javascript.cpp -o $(OUTFILE) $(LIBS)
@@ -16,8 +17,7 @@ clean:
 	rm $(OUTFILE)
 
 install:
-	install -m 644 -D $(OUTFILE) "$(DESTDIR)$(shell $(PKG_CONFIG) --variable=hexchatlibdir hexchat-plugin)/$(OUTFILE)"
+	install -m644 -D $(OUTFILE) "$(INSTALLDIR)/$(OUTFILE)"
 
 uninstall:
-	rm "$(DESTDIR)$(shell $(PKG_CONFIG) --variable=hexchatlibdir hexchat-plugin 2>/dev/null)/$(OUTFILE)"
-
+	rm -f "$(INSTALLDIR)/$(OUTFILE)"
