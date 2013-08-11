@@ -1312,6 +1312,22 @@ hjs_getpluginpref (JSContext *context, unsigned argc, jsval *vp)
 	return JS_TRUE;
 }
 
+/* Convenience functions */
+
+static JSBool
+hjs_getnickcolor (JSContext *context, unsigned argc, jsval *vp)
+{
+	int colors[] = {19, 20, 22, 24, 25, 26, 27, 28, 29};
+	JSString* nick;
+
+	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "S", &nick))
+		return JS_FALSE;
+
+	JS_SET_RVAL(context, vp, INT_TO_JSVAL(colors[JS_GetStringLength(nick) % sizeof(colors)]));
+
+	return JS_TRUE;
+}
+
 static JSFunctionSpec hexchat_functions[] = {
 	{"print", hjs_print, 1, JSPROP_READONLY|JSPROP_PERMANENT},
 	{"emit_print", hjs_emitprint, 6, JSPROP_READONLY|JSPROP_PERMANENT},
@@ -1336,6 +1352,8 @@ static JSFunctionSpec hexchat_functions[] = {
 	{"get_pluginpref", hjs_getpluginpref, 2, JSPROP_READONLY|JSPROP_PERMANENT},
 	{"list_pluginpref", hjs_listpluginpref, 0, JSPROP_READONLY|JSPROP_PERMANENT},
 	{"del_pluginpref", hjs_delpluginpref, 1, JSPROP_READONLY|JSPROP_PERMANENT},
+	/* convenience functions not part of api */
+	{"get_nickcolor", hjs_getnickcolor, 1, JSPROP_READONLY|JSPROP_PERMANENT},
 	{0}
 };
 
