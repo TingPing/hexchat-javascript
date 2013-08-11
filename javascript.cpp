@@ -217,12 +217,16 @@ static time_t
 hjs_util_timefromdate (JSContext *context, JSObject *date)
 {
 	jsval retval;
+	double time;
 
 	if (!JS_CallFunctionName(context, date, "getTime", 0, nullptr, &retval))
 		return (time_t)0;
 
-	if (JSVAL_IS_INT(retval))
-		return (time_t)(JSVAL_TO_INT(retval));
+	if (JSVAL_IS_NUMBER(retval))
+	{
+		if (JS_ValueToNumber(context, retval, &time))
+			return (time_t)(time / 1000);
+	}
 
 	return (time_t)0;
 }
