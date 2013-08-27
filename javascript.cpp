@@ -1319,11 +1319,22 @@ hjs_getnickcolor (JSContext *context, unsigned argc, jsval *vp)
 {
 	int colors[] = {19, 20, 22, 24, 25, 26, 27, 28, 29};
 	JSString* nick;
+	char* cnick;
+	int i = 0, sum = 0, color;
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "S", &nick))
 		return JS_FALSE;
 
-	JS_SET_RVAL(context, vp, INT_TO_JSVAL(colors[JS_GetStringLength(nick) % sizeof(colors)]));
+	cnick = JSSTRING_TO_CHAR(nick);
+
+	while (cnick[i])
+		sum += cnick[i++];
+	sum %= sizeof(colors) / sizeof(int);
+	color = colors[sum];
+
+	JS_free (context, cnick);
+
+	JS_SET_RVAL(context, vp, INT_TO_JSVAL(color));
 
 	return JS_TRUE;
 }
