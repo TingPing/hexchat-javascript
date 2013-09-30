@@ -1219,7 +1219,7 @@ hjs_listpluginpref (JSContext *context, unsigned argc, jsval *vp)
 	JSObject* js_list;
 	JSString* list_item;
 	jsuint list_len;
-	char list[512];
+	char list[4096];
 	char* token;
 	int result;
 	int index = 0;
