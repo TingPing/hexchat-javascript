@@ -1,7 +1,7 @@
 HexChat Javascript
 ==================
 
-[![Build Status](https://travis-ci.org/TingPing/hexchat-javascript.png?branch=master)](https://travis-ci.org/TingPing/hexchat-javascript)
+[![Build Status](https://travis-ci.org/TingPing/hexchat-javascript.png?branch=master)](https://travis-ci.org/TingPing/hexchat-javascript) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/TingPing/hexchat-javascript/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
 Javascript interface using Spidermonkey.
 
