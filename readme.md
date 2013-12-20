@@ -24,8 +24,6 @@ Features
 Downloads
 ---------
 
-- [Fedora](http://dl.tingping.se/fedora/x86_64/)
-- [Arch](https://aur.archlinux.org/packages/hexchat-javascript-git/)
 - [Windows](https://github.com/TingPing/hexchat-javascript/releases)
 
 
@@ -47,6 +45,11 @@ Installation
 
 1. Download a repo file from [here](http://copr-fe.cloud.fedoraproject.org/coprs/tingping/hexchat-javascript/) into */etc/yum.repos.d/*
 2. ```yum install hexchat-javascript```
+
+###Arch:
+
+1. Download package from [hexchat-javascript-git](https://aur.archlinux.org/packages/hexchat-javascript-git/) on the AUR.
+2. Follow the [wiki](https://wiki.archlinux.org/index.php/Arch_User_Repository#Installing_packages) to install.
 
 Building
 --------
