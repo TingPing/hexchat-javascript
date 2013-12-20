@@ -20,13 +20,6 @@ Features
 - Full coverage of hexchat api
 - Windows and Unix support
 
-
-Downloads
----------
-
-- [Windows](https://github.com/TingPing/hexchat-javascript/releases)
-
-
 Requirements
 ------------
 
@@ -38,13 +31,13 @@ Installation
 
 ###Windows:
 
-1. Place the javascript.dll linked above in the *addons* folder within your [config dir](http://docs.hexchat.org/en/latest/settings.html#config-files).
+1. Place the [javascript.dll](https://github.com/TingPing/hexchat-javascript/releases) in the *addons* folder within your [config dir](http://docs.hexchat.org/en/latest/settings.html#config-files).
 2. Install Javascript, instructions are on the [wiki](https://github.com/TingPing/hexchat-javascript/wiki/Javascript-on-Windows).
 
 ###Fedora:
 
 1. Download a repo file from [here](http://copr-fe.cloud.fedoraproject.org/coprs/tingping/hexchat-javascript/) into */etc/yum.repos.d/*
-2. ```yum install hexchat-javascript```
+2. *yum install hexchat-javascript*
 
 ###Arch:
 
