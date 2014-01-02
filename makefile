@@ -10,10 +10,10 @@ CXXFLAGS += -std=c++0x -fPIC \
 			-Wno-unused-parameter \
 			-Wno-write-strings
 
-CXXFLAGS += $(shell $(PKG_CONFIG) --cflags mozjs185) \
+CXXFLAGS += $(shell $(PKG_CONFIG) --cflags mozjs-24) \
 			$(shell $(PKG_CONFIG) --cflags hexchat-plugin)
 LDFLAGS += -shared
-LIBS += $(shell $(PKG_CONFIG) --libs mozjs185)
+LIBS += $(shell $(PKG_CONFIG) --libs mozjs-24)
 OUTFILE := javascript.so
 INSTALLDIR := $(DESTDIR)$(shell $(PKG_CONFIG) --variable=hexchatlibdir hexchat-plugin)
 
