@@ -957,7 +957,7 @@ hjs_hookcmd (JSContext *context, unsigned argc, jsval *vp)
 	char* ccmdstr;
 	int pri = HEXCHAT_PRI_NORM;
 	hexchat_hook* hexhook;
-	script_hook* hook = new script_hook;
+	script_hook* hook;
 	js_script* script = hjs_script_find (context);
 
 	// these are slightly out of normal order, does jsapi have kwargs?
@@ -972,6 +972,7 @@ hjs_hookcmd (JSContext *context, unsigned argc, jsval *vp)
 	if (helpstr)
 		chelpstr = JSSTRING_TO_CHAR(helpstr);
 
+	hook = new script_hook;
 	hexhook = hexchat_hook_command (ph, ccmdstr, pri, hjs_callback, helpstr ? chelpstr : "", hook);
 
 	JS_free(context, ccmdstr);
@@ -998,7 +999,7 @@ hjs_hookprint (JSContext *context, unsigned argc, jsval *vp)
 	char* cevent;
 	int pri = HEXCHAT_PRI_NORM;
 	hexchat_hook* hexhook;
-	script_hook* hook = new script_hook;
+	script_hook* hook;
 	js_script* script = hjs_script_find (context);
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "So/oi",
@@ -1009,6 +1010,7 @@ hjs_hookprint (JSContext *context, unsigned argc, jsval *vp)
 		return JS_FALSE;
 
 	cevent = JSSTRING_TO_CHAR(event);
+	hook = new script_hook;
 	hexhook = hexchat_hook_print_attrs (ph, cevent, pri, hjs_callback, hook);
 	JS_free(context, cevent);
 
@@ -1032,7 +1034,7 @@ hjs_hookspecial (JSContext *context, unsigned argc, jsval *vp)
 	char* cevent;
 	int pri = HEXCHAT_PRI_NORM;
 	hexchat_hook* hexhook;
-	script_hook* hook = new script_hook;
+	script_hook* hook;
 	js_script* script = hjs_script_find (context);
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "So/oi",
@@ -1045,6 +1047,7 @@ hjs_hookspecial (JSContext *context, unsigned argc, jsval *vp)
 	/* This is technically the same as hook_print except that hook_print_attrs won't work with
 	 * the "special" hooks, so to avoid confusion or adding another hook_print for attrs
 	 * just create a new function hook_special */
+	hook = new script_hook;
 	cevent = JSSTRING_TO_CHAR(event);
 	hexhook = hexchat_hook_print (ph, cevent, pri, hjs_callback, hook);
 	JS_free(context, cevent);
@@ -1069,7 +1072,7 @@ hjs_hookserver (JSContext *context, unsigned argc, jsval *vp)
 	char* cserverstr;
 	int pri = HEXCHAT_PRI_NORM;
 	hexchat_hook* hexhook;
-	script_hook* hook = new script_hook;
+	script_hook* hook;
 	js_script* script = hjs_script_find (context);
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "So/oi",
@@ -1079,6 +1082,7 @@ hjs_hookserver (JSContext *context, unsigned argc, jsval *vp)
 	if (!JS_ObjectIsFunction (context, funcobj))
 		return JS_FALSE;
 
+	hook = new script_hook;
 	cserverstr = JSSTRING_TO_CHAR(serverstr);
 	hexhook = hexchat_hook_server_attrs (ph, cserverstr, pri, hjs_callback, hook);
 	JS_free(context, cserverstr);
@@ -1101,7 +1105,7 @@ hjs_hooktimer (JSContext *context, unsigned argc, jsval *vp)
 	jsval ret;
 	int timeout;
 	hexchat_hook* hexhook;
-	script_hook* hook = new script_hook;
+	script_hook* hook;
 	js_script* script = hjs_script_find (context);
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "io/o",
@@ -1111,6 +1115,7 @@ hjs_hooktimer (JSContext *context, unsigned argc, jsval *vp)
 	if (!JS_ObjectIsFunction (context, funcobj))
 		return JS_FALSE;
 
+	hook = new script_hook;
 	hexhook = hexchat_hook_timer (ph, timeout, hjs_callback, hook);
 
 	script->add_hook (hook, HOOK_TIMER, context, funcobj, userdata, hexhook);
@@ -1128,12 +1133,13 @@ hjs_hookunload (JSContext *context, unsigned argc, jsval *vp)
 {
 	JSObject* funcobj;
 	JSObject* userdata = nullptr;
-	script_hook* hook = new script_hook;
+	script_hook* hook;
 	js_script* script = hjs_script_find (context);
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "o/o", &funcobj, &userdata))
 		return JS_FALSE;
 
+	hook = new script_hook;
 	script->add_hook (hook, HOOK_UNLOAD, context, funcobj, userdata, nullptr);
 
 	JS_SET_RVAL (context, vp, JSVAL_VOID);
