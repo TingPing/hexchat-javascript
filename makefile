@@ -2,7 +2,13 @@ CXX ?= g++
 PKG_CONFIG ?= pkg-config
 
 CXXFLAGS ?= -O2
-CXXFLAGS += -std=c++0x -Wall -fPIC
+CXXFLAGS += -std=c++0x -fPIC \
+			-Wall -Wextra -pedantic \
+			-Wformat \
+			-Wstrict-overflow=5 \
+			-Wunused-macros \
+			-Wno-unused-parameter
+
 CXXFLAGS += $(shell $(PKG_CONFIG) --cflags mozjs185) \
 			$(shell $(PKG_CONFIG) --cflags hexchat-plugin)
 LDFLAGS += -shared

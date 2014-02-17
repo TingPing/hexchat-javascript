@@ -1371,7 +1371,7 @@ static JSFunctionSpec hexchat_functions[] = {
 	{"del_pluginpref", hjs_delpluginpref, 1, JSPROP_READONLY|JSPROP_PERMANENT},
 	/* convenience functions not part of api */
 	{"get_nickcolor", hjs_getnickcolor, 1, JSPROP_READONLY|JSPROP_PERMANENT},
-	{0}
+	{0, 0, 0, 0}
 };
 
 
