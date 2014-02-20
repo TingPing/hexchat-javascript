@@ -7,7 +7,8 @@ CXXFLAGS += -std=c++0x -fPIC \
 			-Wformat \
 			-Wstrict-overflow=5 \
 			-Wunused-macros \
-			-Wno-unused-parameter
+			-Wno-unused-parameter \
+			-Wno-write-strings
 
 CXXFLAGS += $(shell $(PKG_CONFIG) --cflags mozjs185) \
 			$(shell $(PKG_CONFIG) --cflags hexchat-plugin)
