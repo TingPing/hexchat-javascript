@@ -277,7 +277,8 @@ hjs_script_getproperty (JSContext* context, string property, string fallback)
 	char* cstr;
 	string str;
 
-	if (JS_HasProperty (context, globals, property.c_str(), &found))
+	if (context != nullptr
+		&& JS_HasProperty (context, globals, property.c_str(), &found))
 	{
 		if (found)
 		{
@@ -1427,23 +1428,25 @@ js_init (JSContext **cx, JSRuntime **rt, JSObject **globals, bool fake)
 static void
 js_deinit (JSContext *cx, JSRuntime *rt)
 {
-    JS_DestroyContext(cx);
-    JS_DestroyRuntime(rt);
+	if (cx != nullptr)
+		JS_DestroyContext(cx);
+	if (rt != nullptr)
+		JS_DestroyRuntime(rt);
 }
 
 js_script::js_script (string file, string src)
 {
-	JSObject* fake_globals;
-	JSContext* fake_context;
-	JSRuntime* fake_runtime;
+	JSObject* fake_globals = nullptr;
+	JSContext* fake_context = nullptr;
+	JSRuntime* fake_runtime = nullptr;
 
 	js_script_list.push_back(this);
 
 	filename = file;
 
 	// create a fake runtime to get the scripts name without actually running it, is there an easier way?
-	js_init (&fake_context, &fake_runtime, &fake_globals, true);
-	JS_EvaluateScript (fake_context, fake_globals, src.c_str(), src.length(), file.c_str(), 0, nullptr);
+	if (js_init (&fake_context, &fake_runtime, &fake_globals, true))
+		JS_EvaluateScript (fake_context, fake_globals, src.c_str(), src.length(), file.c_str(), 0, nullptr);
 
 	name = hjs_script_getproperty (fake_context, "SCRIPT_NAME", hjs_util_shrinkfile(file));
 	desc = hjs_script_getproperty (fake_context, "SCRIPT_DESC", file);
@@ -1453,8 +1456,10 @@ js_script::js_script (string file, string src)
 	js_deinit (fake_context, fake_runtime);
 
 	// now the real thing..
-	js_init (&context, &runtime, &globals, false);
-	JS_EvaluateScript (context, globals, src.c_str(), src.length(), file.c_str(), 0, nullptr);
+	if (js_init (&context, &runtime, &globals, false))
+		JS_EvaluateScript (context, globals, src.c_str(), src.length(), file.c_str(), 0, nullptr);
+	else
+		hexchat_printf (ph, "\00320JavaScript Error:\017: Failed to initialize %s", name.c_str());
 }
 
 void
