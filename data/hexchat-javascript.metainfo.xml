@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<component type="addon">
+	<metadata_license>CC0-1.0</metadata_license>
+	<project_license>MPL-2.0</project_license>
+	<id>hexchat-javascript</id>
+	<extends>hexchat.desktop</extends>
+	<name>Javascript Interface</name>
+	<summary>Adds support for Javascript scripts to HexChat</summary>
+	<url type="homepage">https://github.com/TingPing/hexchat-javascript</url>
+	<updatecontact>tingping_at_fedoraproject.org</updatecontact>
+</component>
+
