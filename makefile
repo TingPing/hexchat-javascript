@@ -29,6 +29,7 @@ clean:
 
 install:
 	install -m644 -D $(OUTFILE) "$(INSTALLDIR)/$(OUTFILE)"
+	install -d "$(DATADIR)/appdata"
 	install -m644 "data/hexchat-javascript.metainfo.xml" -t "$(DATADIR)/appdata"
 
 uninstall:
