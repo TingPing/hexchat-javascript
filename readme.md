@@ -50,7 +50,7 @@ Building
 
 ###Linux:
 
-1. Install the hexchat and js dev package from your distro of choice.
+1. Install the hexchat and js dev package from your distro of choice. (e.g. js-devel, libmozjs185-dev, js185)
 2. *make && sudo make install*
 
 ###Windows:
