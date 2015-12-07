@@ -1,4 +1,9 @@
+sudo: false
 language: cpp
 compiler: gcc
-before_script: sudo apt-get install -qq libmozjs185-dev
+cache: apt
+addons:
+    apt:
+        packages:
+            - libmozjs185-dev
 script: CPLUS_INCLUDE_PATH="win32" make
