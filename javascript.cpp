@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+#include <cstring>
 #include <string>
 #include <fstream>
 #include <list>
@@ -227,6 +228,12 @@ hjs_util_timefromdate (JSContext *context, JSObject *date)
 	return (time_t)0;
 }
 
+static jsval
+hjs_util_pointer_to_jsval(JSContext *context, const void *ptr)
+{
+	string ctxstr = std::to_string((unsigned long long)ptr);
+	return STRING_TO_JSVAL(JS_NewStringCopyZ (context, ctxstr.c_str()));
+}
 
 /* script functions */
 
@@ -847,7 +854,15 @@ hjs_getlist (JSContext *context, unsigned argc, jsval *vp)
 					break;
 
 				case 'p': // pointer
-					// don't handle this for now, can they even be used?
+					if (!strcmp(field, "context"))
+					{
+						const char *ptr = hexchat_list_str (ph, list, field);
+						sattr = hjs_util_pointer_to_jsval (context, ptr);
+						if (!JS_DefineProperty (context, list_obj, field, sattr,
+										nullptr, nullptr, JSPROP_READONLY|JSPROP_ENUMERATE))
+							goto listerr;
+					}
+					// No other pointers exist atm and we couldn't handle them.
 					break;
 			}
 		}
@@ -882,9 +897,9 @@ hjs_findcontext (JSContext *context, unsigned argc, jsval *vp)
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "/SS", &network, &channel))
 		return JS_FALSE;
 
-	if (network)
+	if (network && JS_GetStringLength(network))
 		cnetwork = JSSTRING_TO_CHAR(network);
-	if (channel)
+	if (channel && JS_GetStringLength(channel))
 		cchannel = JSSTRING_TO_CHAR(channel);
 
 	ctx = hexchat_find_context (ph, cnetwork, cchannel);
@@ -896,10 +911,11 @@ hjs_findcontext (JSContext *context, unsigned argc, jsval *vp)
 
 	if (!ctx)
 		JS_SET_RVAL (context, vp, JSVAL_NULL);
-	else if (!JS_NewNumberValue(context, (long)ctx, &ret))
-		JS_SET_RVAL (context, vp, JSVAL_VOID);
 	else
+	{
+		ret = hjs_util_pointer_to_jsval (context, ctx);
 		JS_SET_RVAL (context, vp, ret);
+	}
 
 	return JS_TRUE;
 }
@@ -908,17 +924,16 @@ static JSBool
 hjs_getcontext (JSContext *context, unsigned argc, jsval *vp)
 {
 	hexchat_context* ctx;
+	string ctxstr;
 	jsval ret;
 
 	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), ""))
 		return JS_FALSE;
 
 	ctx = hexchat_get_context (ph);
+	ret = hjs_util_pointer_to_jsval (context, ctx);
 
-	if (!JS_NewNumberValue(context, (long)ctx, &ret))
-		JS_SET_RVAL (context, vp, JSVAL_VOID);
-	else
-		JS_SET_RVAL (context, vp, ret);
+	JS_SET_RVAL(context, vp, ret);
 
 	return JS_TRUE;
 }
@@ -926,13 +941,18 @@ hjs_getcontext (JSContext *context, unsigned argc, jsval *vp)
 static JSBool
 hjs_setcontext (JSContext *context, unsigned argc, jsval *vp)
 {
-	long ctxnum;
+	unsigned long long ctxaddr;
+	JSString *ctxstr;
+	char *ctxcstr;
 	hexchat_context* ctx;
 
-	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "u", &ctxnum))
+	if (!JS_ConvertArguments (context, argc, JS_ARGV(context, vp), "S", &ctxstr))
 		return JS_FALSE;
 
-	ctx = (hexchat_context*)ctxnum;
+	ctxcstr = JSSTRING_TO_CHAR(ctxstr);
+	ctxaddr = strtoull(ctxcstr, NULL, 10);
+	ctx = (hexchat_context*)ctxaddr;
+	JS_free (context, ctxcstr);
 
 	if (hexchat_set_context (ph, ctx))
 		JS_SET_RVAL (context, vp, JSVAL_TRUE);
