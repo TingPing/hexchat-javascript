@@ -1306,7 +1306,7 @@ hjs_getpluginpref (JSContext *context, unsigned argc, jsval *vp)
 			cretint = hexchat_pluginpref_get_int (prefph, cvar);
 			JS_free(context, cvar);
 
-			if ((cretint == 0) && (strcmp(cretstr, "0") != 0))
+			if ((cretint == -1) && (strcmp(cretstr, "-1") != 0))
 			{
 				// Failed to make int and string is not "0", its a string.
 				retstr = JS_NewStringCopyZ (context, cretstr);
