@@ -6,8 +6,8 @@ HexChat Javascript
 
 Javascript interface using Spidermonkey.
 
-Consider this an beta, everything works well enough to do useful things with it
-but the api is very likely to change and some bugs still exist.
+This plugin is no longer actively developed though bugs may be fixed.  
+I suggest using the Lua plugin shipping with modern HexChat as an alternative.
 
 For more information check out the [wiki](https://github.com/TingPing/hexchat-javascript/wiki).
 
